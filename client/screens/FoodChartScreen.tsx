@@ -1,12 +1,11 @@
 import React from "react";
-import { View, StyleSheet, Image } from "react-native";
+import { View, StyleSheet, Image, ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { Feather } from "@expo/vector-icons";
 import Animated, { FadeInDown, FadeInUp, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming, Easing } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 
-import { KeyboardAwareScrollViewCompat } from "@/components/KeyboardAwareScrollViewCompat";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/context/AppContext";
@@ -57,7 +56,7 @@ interface FoodSectionProps {
 }
 
 function FoodSection({ title, items, icon, iconColor, delay }: FoodSectionProps) {
-  const { theme, isDark } = useTheme();
+  const { theme } = useTheme();
 
   return (
     <Animated.View entering={FadeInUp.delay(delay).springify()}>
@@ -95,8 +94,9 @@ export default function FoodChartScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const { theme, isDark } = useTheme();
-  const { t, language } = useApp();
+  const { language } = useApp();
 
+  const plateMethodTitle = language === "bn" ? "প্লেট মেথড" : "The Plate Method";
   const plateMethodItems = language === "bn"
     ? [
         "অর্ধেক প্লেট: সবজি (পালং শাক, বরবটি, বাঁধাকপি, ফুলকপি, লাউ ইত্যাদি)",
@@ -111,6 +111,7 @@ export default function FoodChartScreen() {
         "Add fresh salad",
       ];
 
+  const recommendedTitle = language === "bn" ? "সুপারিশকৃত খাবার" : "Recommended Foods";
   const recommendedFoods = language === "bn"
     ? [
         "সবুজ শাকসবজি (পালং শাক, মেথি শাক, লাউ শাক)",
@@ -129,6 +130,7 @@ export default function FoodChartScreen() {
         "Healthy fats (olive oil, coconut oil)",
       ];
 
+  const avoidTitle = language === "bn" ? "এড়িয়ে চলুন" : "Foods to Avoid";
   const foodsToAvoid = language === "bn"
     ? [
         "পরোটা, সাদা রুটি, বিস্কুট",
@@ -152,14 +154,15 @@ export default function FoodChartScreen() {
       ];
 
   return (
-    <KeyboardAwareScrollViewCompat
+    <ScrollView
       style={{ flex: 1, backgroundColor: theme.backgroundRoot }}
       contentContainerStyle={{
         paddingTop: headerHeight + Spacing.xl,
-        paddingBottom: insets.bottom + Spacing.xl,
+        paddingBottom: insets.bottom + Spacing.xl + Spacing["3xl"],
         paddingHorizontal: Spacing.lg,
       }}
       scrollIndicatorInsets={{ bottom: insets.bottom }}
+      showsVerticalScrollIndicator={true}
     >
       <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.headerSection}>
         <LinearGradient
@@ -182,7 +185,7 @@ export default function FoodChartScreen() {
       </Animated.View>
 
       <FoodSection
-        title={language === "bn" ? "প্লেট মেথড" : "The Plate Method"}
+        title={plateMethodTitle}
         items={plateMethodItems}
         icon="pie-chart"
         iconColor={Colors.light.secondary}
@@ -192,7 +195,7 @@ export default function FoodChartScreen() {
       <View style={{ height: Spacing.md }} />
 
       <FoodSection
-        title={language === "bn" ? "সুপারিশকৃত খাবার" : "Recommended Foods"}
+        title={recommendedTitle}
         items={recommendedFoods}
         icon="check-circle"
         iconColor="#7CB87C"
@@ -202,13 +205,13 @@ export default function FoodChartScreen() {
       <View style={{ height: Spacing.md }} />
 
       <FoodSection
-        title={language === "bn" ? "এড়িয়ে চলুন" : "Foods to Avoid"}
+        title={avoidTitle}
         items={foodsToAvoid}
         icon="x-circle"
         iconColor={Colors.light.primary}
         delay={500}
       />
-    </KeyboardAwareScrollViewCompat>
+    </ScrollView>
   );
 }
 

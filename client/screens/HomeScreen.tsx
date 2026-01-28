@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FlatList, View, StyleSheet, Pressable, Image, ImageBackground } from "react-native";
+import { FlatList, View, StyleSheet, Pressable, Image } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
@@ -25,7 +25,7 @@ import { Spacing, BorderRadius, Colors } from "@/constants/theme";
 
 interface MealOption {
   id: string;
-  items: string[];
+  items: { en: string; bn: string }[];
 }
 
 interface RoutineItem {
@@ -34,9 +34,9 @@ interface RoutineItem {
   subtitleKey: string;
   icon: keyof typeof Feather.glyphMap;
   options?: MealOption[];
-  singleItems?: string[];
-  benefitsKey?: string;
-  avoidKey?: string;
+  singleItems?: { en: string; bn: string }[];
+  benefits?: { en: string; bn: string };
+  avoid?: { en: string; bn: string };
   color: string;
 }
 
@@ -48,10 +48,13 @@ const routineData: RoutineItem[] = [
     icon: "sunrise",
     color: "#FFB347",
     singleItems: [
-      "1 glass of lukewarm water",
-      "Optional: 1 teaspoon soaked fenugreek seeds (soaked overnight)",
+      { en: "1 glass of lukewarm water", bn: "১ গ্লাস কুসুম গরম পানি" },
+      { en: "Optional: 1 teaspoon soaked fenugreek seeds (soaked overnight)", bn: "ঐচ্ছিক: ১ চা চামচ ভেজানো মেথি বীজ (রাতে ভিজিয়ে রাখুন)" },
     ],
-    benefitsKey: "Supports digestion and helps with hormone balance and blood sugar control.",
+    benefits: {
+      en: "Supports digestion and helps with hormone balance and blood sugar control.",
+      bn: "হজমে সাহায্য করে এবং হরমোন ভারসাম্য ও রক্তে শর্করা নিয়ন্ত্রণে সহায়তা করে।"
+    },
   },
   {
     id: "2",
@@ -60,11 +63,22 @@ const routineData: RoutineItem[] = [
     icon: "coffee",
     color: "#E8A5A5",
     options: [
-      { id: "1", items: ["2 boiled eggs", "1 whole wheat flatbread", "Cucumber or tomato"] },
-      { id: "2", items: ["Oats with milk", "Nuts + 1 teaspoon chia seeds", "1 egg"] },
-      { id: "3", items: ["Vegetable omelette (2 eggs)", "1 whole wheat flatbread"] },
+      { id: "1", items: [
+        { en: "2 boiled eggs", bn: "২টি সিদ্ধ ডিম" },
+        { en: "1 whole wheat flatbread", bn: "১টি গমের রুটি" },
+        { en: "Cucumber or tomato", bn: "শসা বা টমেটো" }
+      ]},
+      { id: "2", items: [
+        { en: "Oats with milk", bn: "দুধ দিয়ে ওটস" },
+        { en: "Nuts + 1 teaspoon chia seeds", bn: "বাদাম + ১ চা চামচ চিয়া বীজ" },
+        { en: "1 egg", bn: "১টি ডিম" }
+      ]},
+      { id: "3", items: [
+        { en: "Vegetable omelette (2 eggs)", bn: "সবজি অমলেট (২টি ডিম)" },
+        { en: "1 whole wheat flatbread", bn: "১টি গমের রুটি" }
+      ]},
     ],
-    avoidKey: "Paratha, white bread, biscuits, sugary tea",
+    avoid: { en: "Paratha, white bread, biscuits, sugary tea", bn: "পরোটা, সাদা রুটি, বিস্কুট, চিনিযুক্ত চা" },
   },
   {
     id: "3",
@@ -73,10 +87,10 @@ const routineData: RoutineItem[] = [
     icon: "sun",
     color: "#F4D03F",
     singleItems: [
-      "1 fruit (apple, guava, or orange)",
-      "OR 8-10 almonds",
+      { en: "1 fruit (apple, guava, or orange)", bn: "১টি ফল (আপেল, পেয়ারা, বা কমলা)" },
+      { en: "OR 8-10 almonds", bn: "অথবা ৮-১০টি কাঠবাদাম" },
     ],
-    benefitsKey: "Helps prevent sudden drops in blood sugar.",
+    benefits: { en: "Helps prevent sudden drops in blood sugar.", bn: "রক্তে শর্করার হঠাৎ পতন রোধ করতে সাহায্য করে।" },
   },
   {
     id: "4",
@@ -85,12 +99,12 @@ const routineData: RoutineItem[] = [
     icon: "disc",
     color: "#A8D5A8",
     singleItems: [
-      "Half plate: Vegetables (spinach, beans, cabbage, cauliflower, bottle gourd, etc.)",
-      "One quarter: Protein (fish, chicken, lentils, chickpeas)",
-      "One quarter: Rice (preferably brown/red rice, small portion)",
-      "Add fresh salad",
+      { en: "Half plate: Vegetables (spinach, beans, cabbage, cauliflower, bottle gourd, etc.)", bn: "অর্ধেক প্লেট: সবজি (পালং শাক, বরবটি, বাঁধাকপি, ফুলকপি, লাউ ইত্যাদি)" },
+      { en: "One quarter: Protein (fish, chicken, lentils, chickpeas)", bn: "এক চতুর্থাংশ: প্রোটিন (মাছ, মুরগি, ডাল, ছোলা)" },
+      { en: "One quarter: Rice (preferably brown/red rice, small portion)", bn: "এক চতুর্থাংশ: ভাত (বাদামী/লাল চাল পছন্দনীয়, অল্প পরিমাণে)" },
+      { en: "Add fresh salad", bn: "তাজা সালাদ যোগ করুন" },
     ],
-    avoidKey: "Fried foods, too much potato, and soft drinks",
+    avoid: { en: "Fried foods, too much potato, and soft drinks", bn: "ভাজা খাবার, অতিরিক্ত আলু, এবং কোমল পানীয়" },
   },
   {
     id: "5",
@@ -99,8 +113,8 @@ const routineData: RoutineItem[] = [
     icon: "cloud",
     color: "#85C1E9",
     singleItems: [
-      "Green tea or lemon water (no sugar)",
-      "With: Roasted chickpeas OR boiled egg OR boiled mung beans",
+      { en: "Green tea or lemon water (no sugar)", bn: "গ্রিন টি বা লেবু পানি (চিনি ছাড়া)" },
+      { en: "With: Roasted chickpeas OR boiled egg OR boiled mung beans", bn: "সাথে: ভাজা ছোলা অথবা সিদ্ধ ডিম অথবা সিদ্ধ মুগ ডাল" },
     ],
   },
   {
@@ -110,10 +124,10 @@ const routineData: RoutineItem[] = [
     icon: "moon",
     color: "#7C7CD9",
     singleItems: [
-      "Vegetables + lentils OR fish + vegetables",
-      "1 whole wheat flatbread (avoid rice at night if possible)",
+      { en: "Vegetables + lentils OR fish + vegetables", bn: "সবজি + ডাল অথবা মাছ + সবজি" },
+      { en: "1 whole wheat flatbread (avoid rice at night if possible)", bn: "১টি গমের রুটি (সম্ভব হলে রাতে ভাত এড়িয়ে চলুন)" },
     ],
-    avoidKey: "Heavy rice meals, biryani, noodles, and fast food",
+    avoid: { en: "Heavy rice meals, biryani, noodles, and fast food", bn: "ভারী ভাতের খাবার, বিরিয়ানি, নুডলস, এবং ফাস্ট ফুড" },
   },
   {
     id: "7",
@@ -122,8 +136,8 @@ const routineData: RoutineItem[] = [
     icon: "star",
     color: "#9B59B6",
     singleItems: [
-      "1 glass warm milk",
-      "OR 1 date + 2 almonds",
+      { en: "1 glass warm milk", bn: "১ গ্লাস গরম দুধ" },
+      { en: "OR 1 date + 2 almonds", bn: "অথবা ১টি খেজুর + ২টি বাদাম" },
     ],
   },
 ];
@@ -243,6 +257,8 @@ function RoutineCard({ item, index }: { item: RoutineItem; index: number }) {
     setCompleted(!completed);
   };
 
+  const getText = (item: { en: string; bn: string }) => language === "bn" ? item.bn : item.en;
+
   return (
     <Animated.View entering={FadeInUp.delay(200 + index * 80).springify()}>
       <AnimatedPressable
@@ -307,7 +323,7 @@ function RoutineCard({ item, index }: { item: RoutineItem; index: number }) {
                     <View key={i} style={styles.itemRow}>
                       <View style={[styles.bullet, { backgroundColor: item.color }]} />
                       <ThemedText type="body" style={{ flex: 1, fontFamily: "Nunito_400Regular" }}>
-                        {itm}
+                        {getText(itm)}
                       </ThemedText>
                     </View>
                   ))}
@@ -321,27 +337,27 @@ function RoutineCard({ item, index }: { item: RoutineItem; index: number }) {
                   <View key={i} style={styles.itemRow}>
                     <View style={[styles.bullet, { backgroundColor: item.color }]} />
                     <ThemedText type="body" style={{ flex: 1, fontFamily: "Nunito_400Regular" }}>
-                      {itm}
+                      {getText(itm)}
                     </ThemedText>
                   </View>
                 ))}
               </View>
             ) : null}
 
-            {item.benefitsKey ? (
+            {item.benefits ? (
               <View style={[styles.infoBox, { backgroundColor: Colors.light.secondary + "15" }]}>
                 <Feather name="check-circle" size={18} color={Colors.light.secondary} />
                 <ThemedText type="small" style={{ flex: 1, marginLeft: Spacing.sm, fontFamily: "Nunito_400Regular" }}>
-                  {item.benefitsKey}
+                  {getText(item.benefits)}
                 </ThemedText>
               </View>
             ) : null}
 
-            {item.avoidKey ? (
+            {item.avoid ? (
               <View style={[styles.infoBox, { backgroundColor: Colors.light.primary + "15" }]}>
                 <Feather name="x-circle" size={18} color={Colors.light.primary} />
                 <ThemedText type="small" style={{ flex: 1, marginLeft: Spacing.sm, fontFamily: "Nunito_400Regular" }}>
-                  {t("avoid")}: {item.avoidKey}
+                  {t("avoid")}: {getText(item.avoid)}
                 </ThemedText>
               </View>
             ) : null}

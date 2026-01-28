@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, Pressable, Image } from "react-native";
+import { View, StyleSheet, Pressable, Image, ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
@@ -10,7 +10,6 @@ import * as Haptics from "expo-haptics";
 import Animated, { FadeInDown, useAnimatedStyle, useSharedValue, withSpring, withRepeat, withSequence, withTiming, Easing } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 
-import { KeyboardAwareScrollViewCompat } from "@/components/KeyboardAwareScrollViewCompat";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/context/AppContext";
@@ -67,9 +66,10 @@ interface ResourceCardProps {
   iconColor: string;
   onPress: () => void;
   index: number;
+  viewDetailsText: string;
 }
 
-function ResourceCard({ title, description, icon, imageSource, gradientColors, iconColor, onPress, index }: ResourceCardProps) {
+function ResourceCard({ title, description, icon, imageSource, gradientColors, iconColor, onPress, index, viewDetailsText }: ResourceCardProps) {
   const { theme, isDark } = useTheme();
   const scale = useSharedValue(1);
 
@@ -128,7 +128,7 @@ function ResourceCard({ title, description, icon, imageSource, gradientColors, i
           <View style={styles.cardFooter}>
             <View style={[styles.viewButton, { backgroundColor: iconColor + "15" }]}>
               <ThemedText type="small" style={{ color: iconColor, fontFamily: "Nunito_600SemiBold" }}>
-                View Details
+                {viewDetailsText}
               </ThemedText>
               <Feather name="arrow-right" size={14} color={iconColor} style={{ marginLeft: Spacing.xs }} />
             </View>
@@ -144,18 +144,22 @@ export default function ResourcesScreen() {
   const headerHeight = useHeaderHeight();
   const tabBarHeight = useBottomTabBarHeight();
   const { theme, isDark } = useTheme();
-  const { t } = useApp();
+  const { t, language } = useApp();
   const navigation = useNavigation<NativeStackNavigationProp<ResourcesStackParamList>>();
 
+  const viewDetailsText = language === "bn" ? "বিস্তারিত দেখুন" : "View Details";
+  const headerSubtitle = language === "bn" ? "আপনার স্বাস্থ্যকর জীবনযাপনের গাইড" : "Your guide to healthy living";
+
   return (
-    <KeyboardAwareScrollViewCompat
+    <ScrollView
       style={{ flex: 1, backgroundColor: theme.backgroundRoot }}
       contentContainerStyle={{
         paddingTop: headerHeight + Spacing.xl,
-        paddingBottom: tabBarHeight + Spacing.xl,
+        paddingBottom: tabBarHeight + Spacing.xl + Spacing["3xl"],
         paddingHorizontal: Spacing.lg,
       }}
-      scrollIndicatorInsets={{ bottom: insets.bottom }}
+      scrollIndicatorInsets={{ bottom: tabBarHeight }}
+      showsVerticalScrollIndicator={true}
     >
       <Animated.View entering={FadeInDown.delay(50).springify()} style={styles.headerSection}>
         <LinearGradient
@@ -174,7 +178,7 @@ export default function ResourcesScreen() {
             {t("resources")}
           </ThemedText>
           <ThemedText type="body" style={{ color: theme.textSecondary, textAlign: "center", marginTop: Spacing.xs, fontFamily: "Nunito_400Regular" }}>
-            {t("language") === "bn" ? "আপনার স্বাস্থ্যকর জীবনযাপনের গাইড" : "Your guide to healthy living"}
+            {headerSubtitle}
           </ThemedText>
         </LinearGradient>
       </Animated.View>
@@ -188,6 +192,7 @@ export default function ResourcesScreen() {
         iconColor={Colors.light.secondary}
         onPress={() => navigation.navigate("FoodChart")}
         index={0}
+        viewDetailsText={viewDetailsText}
       />
       <View style={{ height: Spacing.lg }} />
       <ResourceCard
@@ -199,8 +204,9 @@ export default function ResourcesScreen() {
         iconColor={Colors.light.primary}
         onPress={() => navigation.navigate("Exercise")}
         index={1}
+        viewDetailsText={viewDetailsText}
       />
-    </KeyboardAwareScrollViewCompat>
+    </ScrollView>
   );
 }
 

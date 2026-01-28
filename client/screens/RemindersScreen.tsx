@@ -1,12 +1,11 @@
 import React from "react";
-import { View, StyleSheet, Pressable, Switch, Image, Platform, Linking } from "react-native";
+import { View, StyleSheet, Pressable, Switch, Image, Platform, Linking, ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import Animated, { FadeInDown, FadeInUp, useAnimatedStyle, useSharedValue, withSpring, withRepeat, withSequence } from "react-native-reanimated";
 
-import { KeyboardAwareScrollViewCompat } from "@/components/KeyboardAwareScrollViewCompat";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/context/AppContext";
@@ -30,6 +29,26 @@ const reminderColors: Record<string, string> = {
   dinner: "#7C7CD9",
   water: "#5DADE2",
   sleep: "#9B59B6",
+};
+
+const reminderTitlesBn: Record<string, string> = {
+  morningReminder: "সকালের রুটিন",
+  breakfastReminder: "নাস্তার সময়",
+  lunchReminder: "দুপুরের খাবারের সময়",
+  exerciseReminder: "ব্যায়ামের সময়",
+  dinnerReminder: "রাতের খাবারের সময়",
+  waterReminder: "পানি পানের রিমাইন্ডার",
+  sleepReminder: "ঘুমানোর সময়",
+};
+
+const reminderTitlesEn: Record<string, string> = {
+  morningReminder: "Morning Routine",
+  breakfastReminder: "Breakfast Time",
+  lunchReminder: "Lunch Time",
+  exerciseReminder: "Exercise Time",
+  dinnerReminder: "Dinner Time",
+  waterReminder: "Water Reminder",
+  sleepReminder: "Bedtime Reminder",
 };
 
 function BellAnimation() {
@@ -62,7 +81,7 @@ export default function RemindersScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const { theme, isDark } = useTheme();
-  const { t, reminders, toggleReminder, hasNotificationPermission, requestNotificationPermission } = useApp();
+  const { t, language, reminders, toggleReminder, hasNotificationPermission, requestNotificationPermission } = useApp();
 
   const handleToggle = async (id: string) => {
     if (!hasNotificationPermission) {
@@ -87,15 +106,28 @@ export default function RemindersScreen() {
     }
   };
 
+  const getReminderTitle = (titleKey: string) => {
+    if (language === "bn") {
+      return reminderTitlesBn[titleKey] || titleKey;
+    }
+    return reminderTitlesEn[titleKey] || titleKey;
+  };
+
+  const headerTitle = language === "bn" ? "রিমাইন্ডার" : "Reminders";
+  const headerSubtitle = language === "bn" ? "আপনার রুটিনের জন্য দৈনিক রিমাইন্ডার সেট করুন" : "Set daily reminders for your routine";
+  const enableNotificationsText = language === "bn" ? "নোটিফিকেশন চালু করুন" : "Enable Notifications";
+  const permissionNeededText = language === "bn" ? "রিমাইন্ডার পাঠাতে অনুমতি প্রয়োজন" : "Permission needed to send reminders";
+
   return (
-    <KeyboardAwareScrollViewCompat
+    <ScrollView
       style={{ flex: 1, backgroundColor: theme.backgroundRoot }}
       contentContainerStyle={{
         paddingTop: headerHeight + Spacing.xl,
-        paddingBottom: insets.bottom + Spacing.xl,
+        paddingBottom: insets.bottom + Spacing.xl + Spacing["3xl"],
         paddingHorizontal: Spacing.lg,
       }}
       scrollIndicatorInsets={{ bottom: insets.bottom }}
+      showsVerticalScrollIndicator={true}
     >
       <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.headerSection}>
         <Image
@@ -104,10 +136,10 @@ export default function RemindersScreen() {
           resizeMode="contain"
         />
         <ThemedText type="h3" style={{ fontFamily: "Nunito_700Bold", textAlign: "center", marginTop: Spacing.lg }}>
-          {t("reminders")}
+          {headerTitle}
         </ThemedText>
         <ThemedText type="body" style={{ color: theme.textSecondary, textAlign: "center", marginTop: Spacing.xs, fontFamily: "Nunito_400Regular" }}>
-          {t("reminderSubtitle")}
+          {headerSubtitle}
         </ThemedText>
       </Animated.View>
 
@@ -120,10 +152,10 @@ export default function RemindersScreen() {
             <View style={styles.permissionContent}>
               <BellAnimation />
               <ThemedText type="h4" style={{ fontFamily: "Nunito_600SemiBold", marginTop: Spacing.md, textAlign: "center" }}>
-                {t("enableNotifications")}
+                {enableNotificationsText}
               </ThemedText>
               <ThemedText type="small" style={{ color: theme.textSecondary, marginTop: Spacing.xs, textAlign: "center", fontFamily: "Nunito_400Regular" }}>
-                {t("notificationPermissionNeeded")}
+                {permissionNeededText}
               </ThemedText>
             </View>
           </Pressable>
@@ -149,7 +181,7 @@ export default function RemindersScreen() {
               </View>
               <View style={styles.reminderInfo}>
                 <ThemedText type="body" style={{ fontFamily: "Nunito_600SemiBold" }}>
-                  {t(reminder.title)}
+                  {getReminderTitle(reminder.title)}
                 </ThemedText>
                 <ThemedText type="small" style={{ color: theme.textSecondary, fontFamily: "Nunito_400Regular" }}>
                   {reminder.time}
@@ -165,7 +197,7 @@ export default function RemindersScreen() {
           </Animated.View>
         ))}
       </View>
-    </KeyboardAwareScrollViewCompat>
+    </ScrollView>
   );
 }
 

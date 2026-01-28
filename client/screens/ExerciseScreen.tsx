@@ -1,12 +1,11 @@
 import React from "react";
-import { View, StyleSheet, Image } from "react-native";
+import { View, StyleSheet, Image, ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { Feather } from "@expo/vector-icons";
 import Animated, { FadeInDown, FadeInUp, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming, Easing } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 
-import { KeyboardAwareScrollViewCompat } from "@/components/KeyboardAwareScrollViewCompat";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/context/AppContext";
@@ -96,22 +95,27 @@ export default function ExerciseScreen() {
   const { theme, isDark } = useTheme();
   const { t, language } = useApp();
 
+  const exerciseTitle = language === "bn" ? "ব্যায়াম" : "Exercise";
   const exerciseTips = language === "bn"
     ? ["প্রতিদিন ৩০ মিনিট হাঁটা", "হালকা কার্ডিও, স্কিপিং, বা যোগব্যায়াম"]
     : ["30 minutes walking daily", "Light cardio, skipping, or yoga"];
 
+  const sleepTitle = language === "bn" ? "ঘুম" : "Sleep";
   const sleepTips = language === "bn"
     ? ["৭-৮ ঘণ্টা ঘুম", "রাত ১১টার আগে ঘুমান"]
     : ["7-8 hours of sleep", "Sleep before 11 PM"];
 
+  const hydrationTitle = language === "bn" ? "পানি পান" : "Hydration";
   const hydrationTips = language === "bn"
     ? ["প্রতিদিন ২.৫-৩ লিটার পানি পান করুন"]
     : ["Drink 2.5-3 liters of water daily"];
 
+  const stressTitle = language === "bn" ? "মানসিক চাপ নিয়ন্ত্রণ" : "Stress Management";
   const stressTips = language === "bn"
     ? ["গভীর শ্বাস নিন", "প্রার্থনা বা ধ্যান করুন", "সঙ্গীত শুনুন", "হালকা হাঁটা"]
     : ["Deep breathing", "Prayer or meditation", "Listen to music", "Light walks"];
 
+  const doctorTitle = language === "bn" ? "ডাক্তার দেখান যদি" : "See a Doctor If";
   const warningItems = language === "bn"
     ? [
         "পিরিয়ড ২-৩ মাস বন্ধ থাকলে",
@@ -127,14 +131,15 @@ export default function ExerciseScreen() {
       ];
 
   return (
-    <KeyboardAwareScrollViewCompat
+    <ScrollView
       style={{ flex: 1, backgroundColor: theme.backgroundRoot }}
       contentContainerStyle={{
         paddingTop: headerHeight + Spacing.xl,
-        paddingBottom: insets.bottom + Spacing.xl,
+        paddingBottom: insets.bottom + Spacing.xl + Spacing["3xl"],
         paddingHorizontal: Spacing.lg,
       }}
       scrollIndicatorInsets={{ bottom: insets.bottom }}
+      showsVerticalScrollIndicator={true}
     >
       <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.headerSection}>
         <LinearGradient
@@ -157,7 +162,7 @@ export default function ExerciseScreen() {
       </Animated.View>
 
       <TipCard
-        title={t("exercise")}
+        title={exerciseTitle}
         items={exerciseTips}
         icon="activity"
         iconColor={Colors.light.secondary}
@@ -167,7 +172,7 @@ export default function ExerciseScreen() {
       <View style={{ height: Spacing.md }} />
 
       <TipCard
-        title={t("sleep")}
+        title={sleepTitle}
         items={sleepTips}
         icon="moon"
         iconColor="#7C7CD9"
@@ -177,7 +182,7 @@ export default function ExerciseScreen() {
       <View style={{ height: Spacing.md }} />
 
       <TipCard
-        title={t("hydration")}
+        title={hydrationTitle}
         items={hydrationTips}
         icon="droplet"
         iconColor="#5DADE2"
@@ -187,7 +192,7 @@ export default function ExerciseScreen() {
       <View style={{ height: Spacing.md }} />
 
       <TipCard
-        title={t("stressManagement")}
+        title={stressTitle}
         items={stressTips}
         icon="heart"
         iconColor={Colors.light.primary}
@@ -197,13 +202,13 @@ export default function ExerciseScreen() {
       <View style={{ height: Spacing.md }} />
 
       <TipCard
-        title={t("seeDoctor")}
+        title={doctorTitle}
         items={warningItems}
         icon="alert-circle"
         iconColor="#E57373"
         delay={600}
       />
-    </KeyboardAwareScrollViewCompat>
+    </ScrollView>
   );
 }
 
