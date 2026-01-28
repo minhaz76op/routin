@@ -3,13 +3,49 @@ import { View, StyleSheet, Image } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { Feather } from "@expo/vector-icons";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated, { FadeInDown, FadeInUp, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming, Easing } from "react-native-reanimated";
+import { LinearGradient } from "expo-linear-gradient";
 
 import { KeyboardAwareScrollViewCompat } from "@/components/KeyboardAwareScrollViewCompat";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/context/AppContext";
 import { Spacing, BorderRadius, Colors } from "@/constants/theme";
+
+function PulsingCircle({ color, delay }: { color: string; delay: number }) {
+  const scale = useSharedValue(0.9);
+  const opacity = useSharedValue(0.5);
+  
+  React.useEffect(() => {
+    setTimeout(() => {
+      scale.value = withRepeat(
+        withSequence(
+          withTiming(1.1, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
+          withTiming(0.9, { duration: 1000, easing: Easing.inOut(Easing.ease) })
+        ),
+        -1,
+        true
+      );
+      opacity.value = withRepeat(
+        withSequence(
+          withTiming(1, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
+          withTiming(0.5, { duration: 1000, easing: Easing.inOut(Easing.ease) })
+        ),
+        -1,
+        true
+      );
+    }, delay);
+  }, []);
+  
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    opacity: opacity.value,
+  }));
+  
+  return (
+    <Animated.View style={[styles.pulsingCircle, { backgroundColor: color + "30" }, animatedStyle]} />
+  );
+}
 
 interface TipCardProps {
   title: string;
@@ -23,11 +59,17 @@ function TipCard({ title, items, icon, iconColor, delay }: TipCardProps) {
   const { theme } = useTheme();
 
   return (
-    <Animated.View entering={FadeInDown.delay(delay).springify()}>
+    <Animated.View entering={FadeInUp.delay(delay).springify()}>
       <View style={[styles.card, { backgroundColor: theme.backgroundDefault, borderColor: theme.border }]}>
+        <LinearGradient
+          colors={[iconColor + "08", "transparent"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={StyleSheet.absoluteFill}
+        />
         <View style={styles.cardHeader}>
           <View style={[styles.iconContainer, { backgroundColor: iconColor + "20" }]}>
-            <Feather name={icon} size={20} color={iconColor} />
+            <Feather name={icon} size={22} color={iconColor} />
           </View>
           <ThemedText type="h4" style={{ fontFamily: "Nunito_600SemiBold", flex: 1 }}>
             {title}
@@ -35,12 +77,12 @@ function TipCard({ title, items, icon, iconColor, delay }: TipCardProps) {
         </View>
         <View style={styles.itemsList}>
           {items.map((item, index) => (
-            <View key={index} style={styles.itemRow}>
+            <Animated.View key={index} entering={FadeInUp.delay(delay + index * 40)} style={styles.itemRow}>
               <View style={[styles.bullet, { backgroundColor: iconColor }]} />
               <ThemedText type="body" style={{ flex: 1, fontFamily: "Nunito_400Regular" }}>
                 {item}
               </ThemedText>
-            </View>
+            </Animated.View>
           ))}
         </View>
       </View>
@@ -51,7 +93,7 @@ function TipCard({ title, items, icon, iconColor, delay }: TipCardProps) {
 export default function ExerciseScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
   const { t, language } = useApp();
 
   const exerciseTips = language === "bn"
@@ -94,12 +136,24 @@ export default function ExerciseScreen() {
       }}
       scrollIndicatorInsets={{ bottom: insets.bottom }}
     >
-      <Animated.View entering={FadeInDown.delay(100).springify()}>
-        <Image
-          source={require("../../assets/images/exercise-illustration.png")}
-          style={styles.headerImage}
-          resizeMode="cover"
-        />
+      <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.headerSection}>
+        <LinearGradient
+          colors={isDark ? [theme.backgroundSecondary, theme.backgroundDefault] : [Colors.light.primary + "15", Colors.light.secondary + "10"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.headerGradient}
+        >
+          <View style={styles.pulsingContainer}>
+            <PulsingCircle color={Colors.light.primary} delay={0} />
+            <PulsingCircle color={Colors.light.secondary} delay={200} />
+            <PulsingCircle color="#7C7CD9" delay={400} />
+          </View>
+          <Image
+            source={require("../../assets/images/exercise-illustration.png")}
+            style={styles.headerImage}
+            resizeMode="cover"
+          />
+        </LinearGradient>
       </Animated.View>
 
       <TipCard
@@ -154,16 +208,36 @@ export default function ExerciseScreen() {
 }
 
 const styles = StyleSheet.create({
+  headerSection: {
+    marginBottom: Spacing.xl,
+  },
+  headerGradient: {
+    borderRadius: BorderRadius.lg,
+    overflow: "hidden",
+    position: "relative",
+  },
   headerImage: {
     width: "100%",
     height: 200,
-    borderRadius: BorderRadius.lg,
-    marginBottom: Spacing.xl,
+  },
+  pulsingContainer: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    zIndex: 10,
+    flexDirection: "row",
+    gap: Spacing.sm,
+  },
+  pulsingCircle: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
   },
   card: {
     borderRadius: BorderRadius.lg,
     padding: Spacing.lg,
     borderWidth: 1,
+    overflow: "hidden",
   },
   cardHeader: {
     flexDirection: "row",
@@ -171,8 +245,8 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
   },
   iconContainer: {
-    width: 44,
-    height: 44,
+    width: 48,
+    height: 48,
     borderRadius: BorderRadius.sm,
     alignItems: "center",
     justifyContent: "center",
@@ -186,10 +260,10 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   bullet: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    marginTop: 8,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginTop: 7,
     marginRight: Spacing.sm,
   },
 });

@@ -1,8 +1,27 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Notifications from "expo-notifications";
+import { Platform } from "react-native";
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  }),
+});
 
 type Language = "en" | "bn";
-type ThemeMode = "light" | "dark" | "system";
+type ThemeMode = "light" | "dark";
+
+interface Reminder {
+  id: string;
+  time: string;
+  title: string;
+  enabled: boolean;
+}
 
 interface AppContextType {
   language: Language;
@@ -10,6 +29,11 @@ interface AppContextType {
   themeMode: ThemeMode;
   setThemeMode: (mode: ThemeMode) => void;
   t: (key: string) => string;
+  reminders: Reminder[];
+  setReminders: (reminders: Reminder[]) => void;
+  toggleReminder: (id: string) => void;
+  hasNotificationPermission: boolean;
+  requestNotificationPermission: () => Promise<boolean>;
 }
 
 const translations: Record<Language, Record<string, string>> = {
@@ -75,6 +99,22 @@ const translations: Record<Language, Record<string, string>> = {
     lightMeal: "Light Meal",
     warmMilk: "1 glass warm milk",
     dateAlmonds: "1 date + 2 almonds",
+    reminders: "Reminders",
+    reminderSubtitle: "Set daily reminders for your routine",
+    enableNotifications: "Enable Notifications",
+    notificationPermissionNeeded: "Permission needed to send reminders",
+    morningReminder: "Morning Routine",
+    breakfastReminder: "Breakfast Time",
+    lunchReminder: "Lunch Time",
+    dinnerReminder: "Dinner Time",
+    exerciseReminder: "Exercise Time",
+    waterReminder: "Water Reminder",
+    sleepReminder: "Bedtime Reminder",
+    reminderEnabled: "Reminder enabled",
+    reminderDisabled: "Reminder disabled",
+    tapToEnable: "Tap to enable",
+    goodMorning: "Good Morning, Juhi!",
+    stayHealthy: "Stay healthy and beautiful today",
   },
   bn: {
     appName: "জুহির রুটিন",
@@ -138,28 +178,82 @@ const translations: Record<Language, Record<string, string>> = {
     lightMeal: "হালকা খাবার",
     warmMilk: "১ গ্লাস গরম দুধ",
     dateAlmonds: "১টি খেজুর + ২টি বাদাম",
+    reminders: "রিমাইন্ডার",
+    reminderSubtitle: "আপনার রুটিনের জন্য দৈনিক রিমাইন্ডার সেট করুন",
+    enableNotifications: "নোটিফিকেশন চালু করুন",
+    notificationPermissionNeeded: "রিমাইন্ডার পাঠাতে অনুমতি প্রয়োজন",
+    morningReminder: "সকালের রুটিন",
+    breakfastReminder: "নাস্তার সময়",
+    lunchReminder: "দুপুরের খাবারের সময়",
+    dinnerReminder: "রাতের খাবারের সময়",
+    exerciseReminder: "ব্যায়ামের সময়",
+    waterReminder: "পানি পানের রিমাইন্ডার",
+    sleepReminder: "ঘুমানোর সময়",
+    reminderEnabled: "রিমাইন্ডার চালু",
+    reminderDisabled: "রিমাইন্ডার বন্ধ",
+    tapToEnable: "চালু করতে ট্যাপ করুন",
+    goodMorning: "সুপ্রভাত, জুহি!",
+    stayHealthy: "আজ সুস্থ ও সুন্দর থাকুন",
   },
 };
+
+const defaultReminders: Reminder[] = [
+  { id: "morning", time: "06:00", title: "morningReminder", enabled: false },
+  { id: "breakfast", time: "08:00", title: "breakfastReminder", enabled: false },
+  { id: "lunch", time: "13:00", title: "lunchReminder", enabled: false },
+  { id: "exercise", time: "17:00", title: "exerciseReminder", enabled: false },
+  { id: "dinner", time: "19:30", title: "dinnerReminder", enabled: false },
+  { id: "water", time: "10:00", title: "waterReminder", enabled: false },
+  { id: "sleep", time: "22:30", title: "sleepReminder", enabled: false },
+];
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>("en");
-  const [themeMode, setThemeModeState] = useState<ThemeMode>("system");
+  const [themeMode, setThemeModeState] = useState<ThemeMode>("light");
+  const [reminders, setRemindersState] = useState<Reminder[]>(defaultReminders);
+  const [hasNotificationPermission, setHasNotificationPermission] = useState(false);
 
   useEffect(() => {
     loadSettings();
+    checkNotificationPermission();
   }, []);
 
   const loadSettings = async () => {
     try {
       const savedLanguage = await AsyncStorage.getItem("language");
       const savedTheme = await AsyncStorage.getItem("themeMode");
+      const savedReminders = await AsyncStorage.getItem("reminders");
       if (savedLanguage) setLanguageState(savedLanguage as Language);
       if (savedTheme) setThemeModeState(savedTheme as ThemeMode);
+      if (savedReminders) setRemindersState(JSON.parse(savedReminders));
     } catch (error) {
       console.error("Error loading settings:", error);
     }
+  };
+
+  const checkNotificationPermission = async () => {
+    const { status } = await Notifications.getPermissionsAsync();
+    setHasNotificationPermission(status === "granted");
+  };
+
+  const requestNotificationPermission = async (): Promise<boolean> => {
+    if (Platform.OS === "web") {
+      return false;
+    }
+    
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    
+    const granted = finalStatus === "granted";
+    setHasNotificationPermission(granted);
+    return granted;
   };
 
   const setLanguage = async (lang: Language) => {
@@ -172,12 +266,63 @@ export function AppProvider({ children }: { children: ReactNode }) {
     await AsyncStorage.setItem("themeMode", mode);
   };
 
+  const setReminders = async (newReminders: Reminder[]) => {
+    setRemindersState(newReminders);
+    await AsyncStorage.setItem("reminders", JSON.stringify(newReminders));
+  };
+
+  const toggleReminder = useCallback(async (id: string) => {
+    const updated = reminders.map((r) =>
+      r.id === id ? { ...r, enabled: !r.enabled } : r
+    );
+    setRemindersState(updated);
+    await AsyncStorage.setItem("reminders", JSON.stringify(updated));
+    
+    const reminder = updated.find((r) => r.id === id);
+    if (reminder?.enabled && hasNotificationPermission) {
+      const [hours, minutes] = reminder.time.split(":").map(Number);
+      const trigger = new Date();
+      trigger.setHours(hours, minutes, 0, 0);
+      if (trigger <= new Date()) {
+        trigger.setDate(trigger.getDate() + 1);
+      }
+      
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: translations[language][reminder.title] || reminder.title,
+          body: translations[language].stayHealthy,
+        },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.DAILY,
+          hour: hours,
+          minute: minutes,
+        },
+        identifier: id,
+      });
+    } else {
+      await Notifications.cancelScheduledNotificationAsync(id);
+    }
+  }, [reminders, hasNotificationPermission, language]);
+
   const t = (key: string): string => {
     return translations[language][key] || key;
   };
 
   return (
-    <AppContext.Provider value={{ language, setLanguage, themeMode, setThemeMode, t }}>
+    <AppContext.Provider
+      value={{
+        language,
+        setLanguage,
+        themeMode,
+        setThemeMode,
+        t,
+        reminders,
+        setReminders,
+        toggleReminder,
+        hasNotificationPermission,
+        requestNotificationPermission,
+      }}
+    >
       {children}
     </AppContext.Provider>
   );
