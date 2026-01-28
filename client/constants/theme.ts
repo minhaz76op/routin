@@ -1,30 +1,43 @@
 import { Platform } from "react-native";
 
-const tintColorLight = "#007AFF";
-const tintColorDark = "#0A84FF";
+const primaryLight = "#E8A5A5";
+const primaryDark = "#D48989";
+const secondary = "#A8D5A8";
 
 export const Colors = {
   light: {
-    text: "#11181C",
+    text: "#2D2520",
+    textSecondary: "#7A736D",
     buttonText: "#FFFFFF",
-    tabIconDefault: "#687076",
-    tabIconSelected: tintColorLight,
-    link: "#007AFF",
-    backgroundRoot: "#FFFFFF", // Elevation 0
-    backgroundDefault: "#F2F2F2", // Elevation 1
-    backgroundSecondary: "#E6E6E6", // Elevation 2
-    backgroundTertiary: "#D9D9D9", // Elevation 3
+    tabIconDefault: "#7A736D",
+    tabIconSelected: primaryLight,
+    link: primaryLight,
+    primary: primaryLight,
+    primaryDark: primaryDark,
+    secondary: secondary,
+    success: "#81C784",
+    border: "#E8E3DF",
+    backgroundRoot: "#FFF9F5",
+    backgroundDefault: "#FFFFFF",
+    backgroundSecondary: "#FFF5F0",
+    backgroundTertiary: "#FFEDE5",
   },
   dark: {
-    text: "#ECEDEE",
+    text: "#F5F1ED",
+    textSecondary: "#A09A94",
     buttonText: "#FFFFFF",
     tabIconDefault: "#9BA1A6",
-    tabIconSelected: tintColorDark,
-    link: "#0A84FF",
-    backgroundRoot: "#1F2123", // Elevation 0
-    backgroundDefault: "#2A2C2E", // Elevation 1
-    backgroundSecondary: "#353739", // Elevation 2
-    backgroundTertiary: "#404244", // Elevation 3
+    tabIconSelected: primaryDark,
+    link: primaryDark,
+    primary: primaryDark,
+    primaryDark: primaryLight,
+    secondary: "#7CB87C",
+    success: "#81C784",
+    border: "#3D3835",
+    backgroundRoot: "#1C1816",
+    backgroundDefault: "#2D2926",
+    backgroundSecondary: "#3D3835",
+    backgroundTertiary: "#4D4845",
   },
 };
 
@@ -93,13 +106,9 @@ export const Typography = {
 
 export const Fonts = Platform.select({
   ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
     sans: "system-ui",
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
     serif: "ui-serif",
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
     rounded: "ui-rounded",
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
     mono: "ui-monospace",
   },
   default: {

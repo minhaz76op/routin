@@ -1,0 +1,47 @@
+import React from "react";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
+import ResourcesScreen from "@/screens/ResourcesScreen";
+import FoodChartScreen from "@/screens/FoodChartScreen";
+import ExerciseScreen from "@/screens/ExerciseScreen";
+import { useScreenOptions } from "@/hooks/useScreenOptions";
+import { useApp } from "@/context/AppContext";
+
+export type ResourcesStackParamList = {
+  Resources: undefined;
+  FoodChart: undefined;
+  Exercise: undefined;
+};
+
+const Stack = createNativeStackNavigator<ResourcesStackParamList>();
+
+export default function ResourcesStackNavigator() {
+  const screenOptions = useScreenOptions();
+  const { t } = useApp();
+
+  return (
+    <Stack.Navigator screenOptions={screenOptions}>
+      <Stack.Screen
+        name="Resources"
+        component={ResourcesScreen}
+        options={{
+          headerTitle: t("resources"),
+        }}
+      />
+      <Stack.Screen
+        name="FoodChart"
+        component={FoodChartScreen}
+        options={{
+          headerTitle: t("foodChart"),
+        }}
+      />
+      <Stack.Screen
+        name="Exercise"
+        component={ExerciseScreen}
+        options={{
+          headerTitle: t("dailyExercise"),
+        }}
+      />
+    </Stack.Navigator>
+  );
+}
