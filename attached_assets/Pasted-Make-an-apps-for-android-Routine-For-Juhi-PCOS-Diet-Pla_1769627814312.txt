@@ -1,0 +1,91 @@
+Make an apps for android:
+
+Routine For Juhi
+PCOS Diet Plan and Healthy Lifestyle Guide (Age 21–22, Underweight Female)
+Create a simple, easy-to-follow daily diet and lifestyle plan for a 21–22 year old female who is physically weak and has PCOS (Polycystic Ovary Syndrome). The goal is to balance hormones, improve energy, maintain a healthy weight, and control insulin levels.
+The plan should be structured by time of day and include food suggestions plus healthy lifestyle tips.
+________________________________________
+🌅 Early Morning (After Waking Up)
+1 glass of lukewarm water
+Optional: 1 teaspoon soaked fenugreek seeds (soaked overnight)
+Benefits: Supports digestion and helps with hormone balance and blood sugar control.
+________________________________________
+🍳 Breakfast (Most Important Meal)
+Choose one option:
+Option 1
+2 boiled eggs
+1 whole wheat flatbread
+Cucumber or tomato
+Option 2
+Oats with milk
+Nuts + 1 teaspoon chia seeds
+1 egg
+Option 3 (For weakness)
+Vegetable omelette (2 eggs)
+1 whole wheat flatbread
+Avoid: Paratha, white bread, biscuits, sugary tea.
+________________________________________
+🍎 Mid-Morning Snack (Around 11 AM)
+1 fruit (apple, guava, or orange)
+OR
+8–10 almonds
+Helps prevent sudden drops in blood sugar.
+________________________________________
+🍛 Lunch
+Use the plate method:
+Half plate: Vegetables (spinach, beans, cabbage, cauliflower, bottle gourd, etc.)
+One quarter: Protein (fish, chicken, lentils, chickpeas)
+One quarter: Rice (preferably brown/red rice, small portion)
+Add fresh salad.
+Avoid fried foods, too much potato, and soft drinks.
+________________________________________
+☕ Evening Snack
+Green tea or lemon water (no sugar)
+With:
+Roasted chickpeas
+OR boiled egg
+OR boiled mung beans
+________________________________________
+🌙 Dinner (Light Meal)
+Eat before 8 PM.
+Vegetables + lentils
+OR fish + vegetables
+1 whole wheat flatbread (avoid rice at night if possible)
+Avoid heavy rice meals, biryani, noodles, and fast food.
+________________________________________
+🥛 Before Bed (If feeling weak)
+1 glass warm milk
+OR
+1 date + 2 almonds
+________________________________________
+🌟 Healthy Lifestyle Tips for PCOS
+Exercise
+30 minutes walking daily
+Light cardio, skipping, or yoga
+Sleep
+7–8 hours
+Sleep before 11 PM
+Hydration
+2.5–3 liters of water daily
+Avoid Sugar & Processed Foods
+Soft drinks
+Sweets
+Bakery items
+Packaged juices
+Stress Management
+Deep breathing, prayer/meditation, music, light walks
+See a Doctor If
+Periods stop for 2–3 months
+Excessive hair fall
+Severe acne
+Sudden weight gain
+
+
+
+Add 2 option like food chart and daily exercise
+add settings button on the top:
+Write profile name: Israt Jahan Juhi
+Add Dark mode (must be functional)
+Add Language (Bangla, English) must workable
+Add Short Message for you (inside this option, write "Love you, dear. This App is only for you. Take care of yourself")
+
