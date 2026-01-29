@@ -23,6 +23,10 @@ interface Reminder {
   enabled: boolean;
 }
 
+interface CompletedRoutines {
+  [date: string]: string[];
+}
+
 interface AppContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
@@ -34,6 +38,10 @@ interface AppContextType {
   toggleReminder: (id: string) => void;
   hasNotificationPermission: boolean;
   requestNotificationPermission: () => Promise<boolean>;
+  completedRoutines: CompletedRoutines;
+  toggleRoutineComplete: (routineId: string) => void;
+  isRoutineCompleted: (routineId: string) => boolean;
+  getTodayCompletedCount: () => number;
 }
 
 const translations: Record<Language, Record<string, string>> = {
@@ -114,7 +122,26 @@ const translations: Record<Language, Record<string, string>> = {
     reminderDisabled: "Reminder disabled",
     tapToEnable: "Tap to enable",
     goodMorning: "Good Morning, Juhi!",
+    goodAfternoon: "Good Afternoon, Juhi!",
+    goodEvening: "Good Evening, Juhi!",
+    goodNight: "Good Night, Juhi!",
     stayHealthy: "Stay healthy and beautiful today",
+    dashboard: "Dashboard",
+    duas: "Duas",
+    duasSubtitle: "Daily prayers for health and peace",
+    morningDua: "Morning Dua",
+    eveningDua: "Evening Dua",
+    healthDua: "Dua for Good Health",
+    moodDua: "Dua for Peace of Mind",
+    eatingDua: "Dua Before Eating",
+    afterEatingDua: "Dua After Eating",
+    sleepDua: "Dua Before Sleep",
+    wakeUpDua: "Dua After Waking Up",
+    completed: "Completed",
+    remaining: "Remaining",
+    todayProgress: "Today's Progress",
+    keepGoing: "Keep going, you're doing great!",
+    viewDuas: "View daily duas and prayers",
   },
   bn: {
     appName: "জুহির রুটিন",
@@ -193,7 +220,26 @@ const translations: Record<Language, Record<string, string>> = {
     reminderDisabled: "রিমাইন্ডার বন্ধ",
     tapToEnable: "চালু করতে ট্যাপ করুন",
     goodMorning: "সুপ্রভাত, জুহি!",
+    goodAfternoon: "শুভ দুপুর, জুহি!",
+    goodEvening: "শুভ সন্ধ্যা, জুহি!",
+    goodNight: "শুভ রাত্রি, জুহি!",
     stayHealthy: "আজ সুস্থ ও সুন্দর থাকুন",
+    dashboard: "ড্যাশবোর্ড",
+    duas: "দোয়া",
+    duasSubtitle: "স্বাস্থ্য ও শান্তির জন্য দৈনিক দোয়া",
+    morningDua: "সকালের দোয়া",
+    eveningDua: "সন্ধ্যার দোয়া",
+    healthDua: "সুস্বাস্থ্যের জন্য দোয়া",
+    moodDua: "মনের শান্তির জন্য দোয়া",
+    eatingDua: "খাওয়ার আগে দোয়া",
+    afterEatingDua: "খাওয়ার পরে দোয়া",
+    sleepDua: "ঘুমানোর আগে দোয়া",
+    wakeUpDua: "ঘুম থেকে উঠার পর দোয়া",
+    completed: "সম্পন্ন",
+    remaining: "বাকি আছে",
+    todayProgress: "আজকের অগ্রগতি",
+    keepGoing: "চালিয়ে যান, আপনি দারুণ করছেন!",
+    viewDuas: "দৈনিক দোয়া দেখুন",
   },
 };
 
@@ -214,20 +260,28 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [themeMode, setThemeModeState] = useState<ThemeMode>("light");
   const [reminders, setRemindersState] = useState<Reminder[]>(defaultReminders);
   const [hasNotificationPermission, setHasNotificationPermission] = useState(false);
+  const [completedRoutines, setCompletedRoutines] = useState<CompletedRoutines>({});
 
   useEffect(() => {
     loadSettings();
     checkNotificationPermission();
   }, []);
 
+  const getTodayKey = () => {
+    const today = new Date();
+    return `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+  };
+
   const loadSettings = async () => {
     try {
       const savedLanguage = await AsyncStorage.getItem("language");
       const savedTheme = await AsyncStorage.getItem("themeMode");
       const savedReminders = await AsyncStorage.getItem("reminders");
+      const savedCompleted = await AsyncStorage.getItem("completedRoutines");
       if (savedLanguage) setLanguageState(savedLanguage as Language);
       if (savedTheme) setThemeModeState(savedTheme as ThemeMode);
       if (savedReminders) setRemindersState(JSON.parse(savedReminders));
+      if (savedCompleted) setCompletedRoutines(JSON.parse(savedCompleted));
     } catch (error) {
       console.error("Error loading settings:", error);
     }
@@ -270,6 +324,32 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setRemindersState(newReminders);
     await AsyncStorage.setItem("reminders", JSON.stringify(newReminders));
   };
+
+  const toggleRoutineComplete = useCallback(async (routineId: string) => {
+    const todayKey = getTodayKey();
+    const todayCompleted = completedRoutines[todayKey] || [];
+    
+    let updated: string[];
+    if (todayCompleted.includes(routineId)) {
+      updated = todayCompleted.filter(id => id !== routineId);
+    } else {
+      updated = [...todayCompleted, routineId];
+    }
+    
+    const newState = { ...completedRoutines, [todayKey]: updated };
+    setCompletedRoutines(newState);
+    await AsyncStorage.setItem("completedRoutines", JSON.stringify(newState));
+  }, [completedRoutines]);
+
+  const isRoutineCompleted = useCallback((routineId: string) => {
+    const todayKey = getTodayKey();
+    return (completedRoutines[todayKey] || []).includes(routineId);
+  }, [completedRoutines]);
+
+  const getTodayCompletedCount = useCallback(() => {
+    const todayKey = getTodayKey();
+    return (completedRoutines[todayKey] || []).length;
+  }, [completedRoutines]);
 
   const toggleReminder = useCallback(async (id: string) => {
     const updated = reminders.map((r) =>
@@ -321,6 +401,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
         toggleReminder,
         hasNotificationPermission,
         requestNotificationPermission,
+        completedRoutines,
+        toggleRoutineComplete,
+        isRoutineCompleted,
+        getTodayCompletedCount,
       }}
     >
       {children}

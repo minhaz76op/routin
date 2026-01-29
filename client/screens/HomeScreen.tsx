@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FlatList, View, StyleSheet, Pressable, Image } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -31,6 +31,7 @@ interface MealOption {
 interface RoutineItem {
   id: string;
   timeKey: string;
+  time: { en: string; bn: string };
   subtitleKey: string;
   icon: keyof typeof Feather.glyphMap;
   options?: MealOption[];
@@ -44,6 +45,7 @@ const routineData: RoutineItem[] = [
   {
     id: "1",
     timeKey: "earlyMorning",
+    time: { en: "6:00 AM", bn: "সকাল ৬:০০" },
     subtitleKey: "afterWakingUp",
     icon: "sunrise",
     color: "#FFB347",
@@ -59,6 +61,7 @@ const routineData: RoutineItem[] = [
   {
     id: "2",
     timeKey: "breakfast",
+    time: { en: "8:00 AM", bn: "সকাল ৮:০০" },
     subtitleKey: "mostImportantMeal",
     icon: "coffee",
     color: "#E8A5A5",
@@ -83,6 +86,7 @@ const routineData: RoutineItem[] = [
   {
     id: "3",
     timeKey: "midMorningSnack",
+    time: { en: "11:00 AM", bn: "সকাল ১১:০০" },
     subtitleKey: "around11AM",
     icon: "sun",
     color: "#F4D03F",
@@ -95,6 +99,7 @@ const routineData: RoutineItem[] = [
   {
     id: "4",
     timeKey: "lunch",
+    time: { en: "1:00 PM", bn: "দুপুর ১:০০" },
     subtitleKey: "plateMethod",
     icon: "disc",
     color: "#A8D5A8",
@@ -109,6 +114,7 @@ const routineData: RoutineItem[] = [
   {
     id: "5",
     timeKey: "eveningSnack",
+    time: { en: "5:00 PM", bn: "বিকাল ৫:০০" },
     subtitleKey: "",
     icon: "cloud",
     color: "#85C1E9",
@@ -120,6 +126,7 @@ const routineData: RoutineItem[] = [
   {
     id: "6",
     timeKey: "dinner",
+    time: { en: "7:30 PM", bn: "রাত ৭:৩০" },
     subtitleKey: "eatBefore8PM",
     icon: "moon",
     color: "#7C7CD9",
@@ -132,6 +139,7 @@ const routineData: RoutineItem[] = [
   {
     id: "7",
     timeKey: "beforeBed",
+    time: { en: "10:00 PM", bn: "রাত ১০:০০" },
     subtitleKey: "ifFeelingWeak",
     icon: "star",
     color: "#9B59B6",
@@ -143,6 +151,27 @@ const routineData: RoutineItem[] = [
 ];
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+function getGreeting(language: "en" | "bn"): string {
+  const hour = new Date().getHours();
+  if (hour >= 5 && hour < 12) {
+    return language === "bn" ? "সুপ্রভাত, জুহি!" : "Good Morning, Juhi!";
+  } else if (hour >= 12 && hour < 17) {
+    return language === "bn" ? "শুভ দুপুর, জুহি!" : "Good Afternoon, Juhi!";
+  } else if (hour >= 17 && hour < 21) {
+    return language === "bn" ? "শুভ সন্ধ্যা, জুহি!" : "Good Evening, Juhi!";
+  } else {
+    return language === "bn" ? "শুভ রাত্রি, জুহি!" : "Good Night, Juhi!";
+  }
+}
+
+function getGreetingIcon(): keyof typeof Feather.glyphMap {
+  const hour = new Date().getHours();
+  if (hour >= 5 && hour < 12) return "sunrise";
+  if (hour >= 12 && hour < 17) return "sun";
+  if (hour >= 17 && hour < 21) return "sunset";
+  return "moon";
+}
 
 function FloatingHeart({ delay }: { delay: number }) {
   const translateY = useSharedValue(0);
@@ -190,7 +219,23 @@ function FloatingHeart({ delay }: { delay: number }) {
 
 function WelcomeHeader() {
   const { theme, isDark } = useTheme();
-  const { t } = useApp();
+  const { t, language, getTodayCompletedCount } = useApp();
+  const [greeting, setGreeting] = useState(getGreeting(language));
+  const [greetingIcon, setGreetingIcon] = useState<keyof typeof Feather.glyphMap>(getGreetingIcon());
+  const completedCount = getTodayCompletedCount();
+  const totalRoutines = routineData.length;
+  
+  useEffect(() => {
+    setGreeting(getGreeting(language));
+    setGreetingIcon(getGreetingIcon());
+    
+    const interval = setInterval(() => {
+      setGreeting(getGreeting(language));
+      setGreetingIcon(getGreetingIcon());
+    }, 60000);
+    
+    return () => clearInterval(interval);
+  }, [language]);
   
   return (
     <Animated.View entering={FadeInDown.delay(50).springify()}>
@@ -212,12 +257,32 @@ function WelcomeHeader() {
           resizeMode="cover"
         />
         <View style={styles.welcomeContent}>
-          <ThemedText type="h3" style={{ fontFamily: "Nunito_700Bold" }}>
-            {t("goodMorning")}
-          </ThemedText>
+          <View style={styles.greetingRow}>
+            <Feather name={greetingIcon} size={24} color={Colors.light.primary} style={{ marginRight: Spacing.sm }} />
+            <ThemedText type="h3" style={{ fontFamily: "Nunito_700Bold" }}>
+              {greeting}
+            </ThemedText>
+          </View>
           <ThemedText type="body" style={{ color: theme.textSecondary, marginTop: Spacing.xs, fontFamily: "Nunito_400Regular" }}>
             {t("stayHealthy")}
           </ThemedText>
+          
+          <View style={styles.progressContainer}>
+            <View style={styles.progressBar}>
+              <View 
+                style={[
+                  styles.progressFill, 
+                  { 
+                    width: `${(completedCount / totalRoutines) * 100}%`,
+                    backgroundColor: Colors.light.secondary,
+                  }
+                ]} 
+              />
+            </View>
+            <ThemedText type="small" style={{ color: theme.textSecondary, marginTop: Spacing.xs, fontFamily: "Nunito_400Regular" }}>
+              {completedCount}/{totalRoutines} {t("completed")}
+            </ThemedText>
+          </View>
         </View>
       </LinearGradient>
     </Animated.View>
@@ -225,9 +290,9 @@ function WelcomeHeader() {
 }
 
 function RoutineCard({ item, index }: { item: RoutineItem; index: number }) {
-  const { theme, isDark } = useTheme();
-  const { t, language } = useApp();
-  const [completed, setCompleted] = useState(false);
+  const { theme } = useTheme();
+  const { t, language, isRoutineCompleted, toggleRoutineComplete } = useApp();
+  const completed = isRoutineCompleted(item.id);
   const [expanded, setExpanded] = useState(false);
   const scale = useSharedValue(1);
   const checkScale = useSharedValue(1);
@@ -254,10 +319,10 @@ function RoutineCard({ item, index }: { item: RoutineItem; index: number }) {
       withSpring(1.3, { damping: 10, stiffness: 200 }),
       withSpring(1, { damping: 10, stiffness: 200 })
     );
-    setCompleted(!completed);
+    toggleRoutineComplete(item.id);
   };
 
-  const getText = (item: { en: string; bn: string }) => language === "bn" ? item.bn : item.en;
+  const getText = (textItem: { en: string; bn: string }) => language === "bn" ? textItem.bn : textItem.en;
 
   return (
     <Animated.View entering={FadeInUp.delay(200 + index * 80).springify()}>
@@ -284,9 +349,17 @@ function RoutineCard({ item, index }: { item: RoutineItem; index: number }) {
             <Feather name={item.icon} size={22} color={item.color} />
           </View>
           <View style={styles.cardTitleContainer}>
-            <ThemedText type="h4" style={{ fontFamily: "Nunito_600SemiBold" }}>
-              {t(item.timeKey)}
-            </ThemedText>
+            <View style={styles.titleRow}>
+              <ThemedText type="h4" style={{ fontFamily: "Nunito_600SemiBold", flex: 1 }}>
+                {t(item.timeKey)}
+              </ThemedText>
+              <View style={[styles.timeBadge, { backgroundColor: item.color + "20" }]}>
+                <Feather name="clock" size={12} color={item.color} />
+                <ThemedText type="small" style={{ color: item.color, marginLeft: 4, fontFamily: "Nunito_600SemiBold" }}>
+                  {getText(item.time)}
+                </ThemedText>
+              </View>
+            </View>
             {item.subtitleKey ? (
               <ThemedText type="small" style={{ color: theme.textSecondary, fontFamily: "Nunito_400Regular" }}>
                 {t(item.subtitleKey)}
@@ -299,13 +372,13 @@ function RoutineCard({ item, index }: { item: RoutineItem; index: number }) {
             style={[
               styles.checkButton,
               {
-                backgroundColor: completed ? Colors.light.success : "transparent",
+                backgroundColor: completed ? Colors.light.success : theme.backgroundSecondary,
                 borderColor: completed ? Colors.light.success : theme.border,
               },
               checkAnimatedStyle,
             ]}
           >
-            {completed ? <Feather name="check" size={16} color="#fff" /> : null}
+            <Feather name="check" size={18} color={completed ? "#fff" : theme.textSecondary} />
           </AnimatedPressable>
         </View>
 
@@ -414,6 +487,10 @@ const styles = StyleSheet.create({
   welcomeContent: {
     padding: Spacing.lg,
   },
+  greetingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
   floatingHeartsContainer: {
     position: "absolute",
     top: 10,
@@ -423,6 +500,19 @@ const styles = StyleSheet.create({
   },
   floatingHeart: {
     position: "absolute",
+  },
+  progressContainer: {
+    marginTop: Spacing.md,
+  },
+  progressBar: {
+    height: 8,
+    backgroundColor: "rgba(0,0,0,0.1)",
+    borderRadius: 4,
+    overflow: "hidden",
+  },
+  progressFill: {
+    height: "100%",
+    borderRadius: 4,
   },
   card: {
     borderRadius: BorderRadius.lg,
@@ -451,13 +541,27 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: Spacing.md,
   },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  timeBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
+    borderRadius: BorderRadius.full,
+    marginLeft: Spacing.sm,
+  },
   checkButton: {
-    width: 32,
-    height: 32,
+    width: 36,
+    height: 36,
     borderRadius: BorderRadius.full,
     borderWidth: 2,
     alignItems: "center",
     justifyContent: "center",
+    marginLeft: Spacing.sm,
   },
   cardContent: {
     marginTop: Spacing.lg,

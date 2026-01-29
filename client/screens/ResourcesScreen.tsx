@@ -61,15 +61,16 @@ interface ResourceCardProps {
   title: string;
   description: string;
   icon: keyof typeof Feather.glyphMap;
-  imageSource: any;
+  imageSource?: any;
   gradientColors: string[];
   iconColor: string;
   onPress: () => void;
   index: number;
   viewDetailsText: string;
+  compact?: boolean;
 }
 
-function ResourceCard({ title, description, icon, imageSource, gradientColors, iconColor, onPress, index, viewDetailsText }: ResourceCardProps) {
+function ResourceCard({ title, description, icon, imageSource, gradientColors, iconColor, onPress, index, viewDetailsText, compact }: ResourceCardProps) {
   const { theme, isDark } = useTheme();
   const scale = useSharedValue(1);
 
@@ -90,6 +91,42 @@ function ResourceCard({ title, description, icon, imageSource, gradientColors, i
     onPress();
   };
 
+  if (compact) {
+    return (
+      <Animated.View entering={FadeInDown.delay(150 + index * 100).springify()}>
+        <AnimatedPressable
+          onPress={handlePress}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          style={[
+            styles.compactCard,
+            { backgroundColor: theme.backgroundDefault, borderColor: theme.border },
+            animatedStyle,
+          ]}
+        >
+          <LinearGradient
+            colors={isDark ? [theme.backgroundSecondary + "50", "transparent"] : gradientColors}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.cardGradient}
+          />
+          <View style={[styles.compactIconBadge, { backgroundColor: iconColor + "20" }]}>
+            <Feather name={icon} size={24} color={iconColor} />
+          </View>
+          <View style={styles.compactContent}>
+            <ThemedText type="body" style={{ fontFamily: "Nunito_600SemiBold" }}>
+              {title}
+            </ThemedText>
+            <ThemedText type="small" style={{ color: theme.textSecondary, fontFamily: "Nunito_400Regular" }}>
+              {description}
+            </ThemedText>
+          </View>
+          <Feather name="chevron-right" size={20} color={theme.textSecondary} />
+        </AnimatedPressable>
+      </Animated.View>
+    );
+  }
+
   return (
     <Animated.View entering={FadeInDown.delay(150 + index * 150).springify()}>
       <AnimatedPressable
@@ -102,24 +139,26 @@ function ResourceCard({ title, description, icon, imageSource, gradientColors, i
           animatedStyle,
         ]}
       >
-        <View style={styles.cardImageContainer}>
-          <Image source={imageSource} style={styles.cardImage} resizeMode="cover" />
-          <LinearGradient
-            colors={["transparent", theme.backgroundDefault]}
-            style={styles.imageOverlay}
-          />
-        </View>
+        {imageSource ? (
+          <View style={styles.cardImageContainer}>
+            <Image source={imageSource} style={styles.cardImage} resizeMode="cover" />
+            <LinearGradient
+              colors={["transparent", theme.backgroundDefault]}
+              style={styles.imageOverlay}
+            />
+          </View>
+        ) : null}
         <LinearGradient
           colors={isDark ? [theme.backgroundSecondary + "50", "transparent"] : gradientColors}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.cardGradient}
         />
-        <View style={styles.cardContent}>
-          <View style={[styles.iconBadge, { backgroundColor: iconColor + "20" }]}>
+        <View style={[styles.cardContent, !imageSource && { paddingTop: Spacing.xl }]}>
+          <View style={[styles.iconBadge, { backgroundColor: iconColor + "20" }, !imageSource && { position: "relative", top: 0, left: 0, marginBottom: Spacing.md }]}>
             <Feather name={icon} size={22} color={iconColor} />
           </View>
-          <ThemedText type="h4" style={{ fontFamily: "Nunito_700Bold", marginTop: Spacing.md }}>
+          <ThemedText type="h4" style={{ fontFamily: "Nunito_700Bold", marginTop: imageSource ? Spacing.md : 0 }}>
             {title}
           </ThemedText>
           <ThemedText type="body" style={{ color: theme.textSecondary, marginTop: Spacing.xs, fontFamily: "Nunito_400Regular" }}>
@@ -195,6 +234,7 @@ export default function ResourcesScreen() {
         viewDetailsText={viewDetailsText}
       />
       <View style={{ height: Spacing.lg }} />
+      
       <ResourceCard
         title={t("dailyExercise")}
         description={t("viewExerciseRoutine")}
@@ -205,6 +245,32 @@ export default function ResourcesScreen() {
         onPress={() => navigation.navigate("Exercise")}
         index={1}
         viewDetailsText={viewDetailsText}
+      />
+      <View style={{ height: Spacing.lg }} />
+
+      <ResourceCard
+        title={t("duas")}
+        description={t("viewDuas")}
+        icon="book"
+        gradientColors={["#7C7CD9" + "10", "transparent"]}
+        iconColor="#7C7CD9"
+        onPress={() => navigation.navigate("Duas")}
+        index={2}
+        viewDetailsText={viewDetailsText}
+        compact
+      />
+      <View style={{ height: Spacing.md }} />
+
+      <ResourceCard
+        title={t("reminders")}
+        description={t("reminderSubtitle")}
+        icon="bell"
+        gradientColors={["#FFB347" + "10", "transparent"]}
+        iconColor="#FFB347"
+        onPress={() => navigation.navigate("Reminders")}
+        index={3}
+        viewDetailsText={viewDetailsText}
+        compact
       />
     </ScrollView>
   );
@@ -235,6 +301,25 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.lg,
     overflow: "hidden",
     borderWidth: 1,
+  },
+  compactCard: {
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.lg,
+    borderWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    overflow: "hidden",
+  },
+  compactIconBadge: {
+    width: 48,
+    height: 48,
+    borderRadius: BorderRadius.sm,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  compactContent: {
+    flex: 1,
+    marginLeft: Spacing.md,
   },
   cardImageContainer: {
     position: "relative",
