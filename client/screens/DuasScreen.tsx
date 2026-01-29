@@ -1,15 +1,18 @@
-import React from "react";
-import { View, StyleSheet, ScrollView } from "react-native";
+import React, { useState } from "react";
+import { View, StyleSheet, ScrollView, Pressable, Platform, ActivityIndicator } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { Feather } from "@expo/vector-icons";
-import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
+import * as Haptics from "expo-haptics";
+import { Audio, AVPlaybackStatus } from "expo-av";
+import Animated, { FadeInDown, FadeInUp, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/context/AppContext";
 import { Spacing, BorderRadius, Colors } from "@/constants/theme";
+import { getApiUrl } from "@/lib/query-client";
 
 interface Dua {
   id: string;
@@ -362,9 +365,107 @@ const duas: Dua[] = [
   },
 ];
 
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+function PlayButton({ dua, isPlaying, isLoading, onPress }: { dua: Dua; isPlaying: boolean; isLoading: boolean; onPress: () => void }) {
+  const { theme } = useTheme();
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const handlePress = () => {
+    scale.value = withSpring(0.9, { damping: 15, stiffness: 200 });
+    setTimeout(() => {
+      scale.value = withSpring(1, { damping: 15, stiffness: 200 });
+    }, 100);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onPress();
+  };
+
+  return (
+    <AnimatedPressable
+      onPress={handlePress}
+      disabled={isLoading}
+      style={[
+        styles.playButton,
+        { backgroundColor: dua.color + "20", borderColor: dua.color },
+        animatedStyle,
+      ]}
+    >
+      {isLoading ? (
+        <ActivityIndicator size="small" color={dua.color} />
+      ) : (
+        <Feather name={isPlaying ? "pause" : "volume-2"} size={20} color={dua.color} />
+      )}
+    </AnimatedPressable>
+  );
+}
+
 function DuaCard({ dua, index }: { dua: Dua; index: number }) {
   const { theme } = useTheme();
   const { language } = useApp();
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [sound, setSound] = useState<Audio.Sound | null>(null);
+
+  const playAudio = async () => {
+    if (isPlaying && sound) {
+      await sound.pauseAsync();
+      setIsPlaying(false);
+      return;
+    }
+
+    if (sound) {
+      await sound.playAsync();
+      setIsPlaying(true);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const apiUrl = getApiUrl();
+      const response = await fetch(new URL("/api/tts", apiUrl).toString(), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: dua.arabic, voice: "alloy" }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to generate audio");
+      }
+
+      const data = await response.json();
+      const audioUri = `data:audio/mp3;base64,${data.audio}`;
+
+      const { sound: newSound } = await Audio.Sound.createAsync(
+        { uri: audioUri },
+        { shouldPlay: true }
+      );
+
+      newSound.setOnPlaybackStatusUpdate((status: AVPlaybackStatus) => {
+        if (status.isLoaded && status.didJustFinish) {
+          setIsPlaying(false);
+        }
+      });
+
+      setSound(newSound);
+      setIsPlaying(true);
+    } catch (error) {
+      console.error("Error playing audio:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    return () => {
+      if (sound) {
+        sound.unloadAsync();
+      }
+    };
+  }, [sound]);
 
   return (
     <Animated.View entering={FadeInUp.delay(100 + index * 50).springify()}>
@@ -382,6 +483,7 @@ function DuaCard({ dua, index }: { dua: Dua; index: number }) {
           <ThemedText type="h4" style={{ fontFamily: "Nunito_600SemiBold", flex: 1 }}>
             {language === "bn" ? dua.title.bn : dua.title.en}
           </ThemedText>
+          <PlayButton dua={dua} isPlaying={isPlaying} isLoading={isLoading} onPress={playAudio} />
         </View>
         
         <View style={styles.arabicContainer}>
@@ -415,6 +517,7 @@ export default function DuasScreen() {
 
   const headerTitle = language === "bn" ? "দৈনিক দোয়া সংকলন" : "Daily Duas Collection";
   const headerSubtitle = language === "bn" ? "২৪টি দোয়া - স্বাস্থ্য, মন ও দৈনন্দিন জীবনের জন্য" : "24 Duas - For health, peace of mind & daily life";
+  const tapToPlayText = language === "bn" ? "শুনতে প্লে বাটন ট্যাপ করুন" : "Tap play button to listen";
 
   return (
     <ScrollView
@@ -441,6 +544,12 @@ export default function DuasScreen() {
           <ThemedText type="body" style={{ color: theme.textSecondary, textAlign: "center", marginTop: Spacing.xs, fontFamily: "Nunito_400Regular" }}>
             {headerSubtitle}
           </ThemedText>
+          <View style={[styles.tipBadge, { backgroundColor: Colors.light.secondary + "20" }]}>
+            <Feather name="volume-2" size={14} color={Colors.light.secondary} />
+            <ThemedText type="small" style={{ color: Colors.light.secondary, marginLeft: Spacing.xs, fontFamily: "Nunito_500Medium" }}>
+              {tapToPlayText}
+            </ThemedText>
+          </View>
         </LinearGradient>
       </Animated.View>
 
@@ -462,6 +571,14 @@ const styles = StyleSheet.create({
     padding: Spacing.xl,
     alignItems: "center",
   },
+  tipBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    borderRadius: BorderRadius.full,
+    marginTop: Spacing.md,
+  },
   duaCard: {
     borderRadius: BorderRadius.lg,
     padding: Spacing.lg,
@@ -480,6 +597,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginRight: Spacing.md,
+  },
+  playButton: {
+    width: 44,
+    height: 44,
+    borderRadius: BorderRadius.full,
+    borderWidth: 2,
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: Spacing.sm,
   },
   arabicContainer: {
     paddingVertical: Spacing.lg,
