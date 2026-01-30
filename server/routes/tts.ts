@@ -5,7 +5,7 @@ const router = Router();
 
 router.post("/api/tts", async (req: Request, res: Response) => {
   try {
-    const { text, voice = "alloy" } = req.body;
+    const { text, voice = "shimmer" } = req.body;
 
     if (!text) {
       return res.status(400).json({ error: "Text is required" });

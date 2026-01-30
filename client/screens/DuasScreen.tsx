@@ -429,7 +429,7 @@ function DuaCard({ dua, index }: { dua: Dua; index: number }) {
       const response = await fetch(new URL("/api/tts", apiUrl).toString(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: dua.arabic, voice: "alloy" }),
+        body: JSON.stringify({ text: dua.arabic, voice: "shimmer" }),
       });
 
       if (!response.ok) {

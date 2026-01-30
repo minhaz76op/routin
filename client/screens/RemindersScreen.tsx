@@ -1,10 +1,11 @@
 import React from "react";
-import { View, StyleSheet, Pressable, Switch, Image, Platform, Linking, ScrollView } from "react-native";
+import { View, StyleSheet, Pressable, Switch, Platform, Linking, ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import Animated, { FadeInDown, FadeInUp, useAnimatedStyle, useSharedValue, withSpring, withRepeat, withSequence } from "react-native-reanimated";
+import { LinearGradient } from "expo-linear-gradient";
 
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
@@ -12,44 +13,87 @@ import { useApp } from "@/context/AppContext";
 import { Spacing, BorderRadius, Colors } from "@/constants/theme";
 
 const reminderIcons: Record<string, keyof typeof Feather.glyphMap> = {
-  morning: "sunrise",
+  fajr: "sunrise",
+  dhuhr: "sun",
+  asr: "cloud",
+  maghrib: "sunset",
+  isha: "moon",
   breakfast: "coffee",
-  lunch: "sun",
-  exercise: "activity",
+  lunch: "disc",
   dinner: "moon",
-  water: "droplet",
-  sleep: "star",
+  morningDua: "book",
+  eveningDua: "book-open",
+  sleepDua: "star",
 };
 
 const reminderColors: Record<string, string> = {
-  morning: "#FFB347",
+  fajr: "#FFB347",
+  dhuhr: "#F4D03F",
+  asr: "#85C1E9",
+  maghrib: "#E67E22",
+  isha: "#7C7CD9",
   breakfast: "#E8A5A5",
   lunch: "#A8D5A8",
-  exercise: "#7CB87C",
   dinner: "#7C7CD9",
-  water: "#5DADE2",
-  sleep: "#9B59B6",
+  morningDua: "#9B59B6",
+  eveningDua: "#E67E22",
+  sleepDua: "#7C7CD9",
 };
 
 const reminderTitlesBn: Record<string, string> = {
-  morningReminder: "সকালের রুটিন",
+  fajrReminder: "ফজরের নামাজ",
+  dhuhrReminder: "যোহরের নামাজ",
+  asrReminder: "আসরের নামাজ",
+  maghribReminder: "মাগরিবের নামাজ",
+  ishaReminder: "এশার নামাজ",
   breakfastReminder: "নাস্তার সময়",
   lunchReminder: "দুপুরের খাবারের সময়",
-  exerciseReminder: "ব্যায়ামের সময়",
   dinnerReminder: "রাতের খাবারের সময়",
-  waterReminder: "পানি পানের রিমাইন্ডার",
-  sleepReminder: "ঘুমানোর সময়",
+  morningDuaReminder: "সকালের দোয়া",
+  eveningDuaReminder: "সন্ধ্যার দোয়া",
+  sleepDuaReminder: "ঘুমানোর দোয়া",
 };
 
 const reminderTitlesEn: Record<string, string> = {
-  morningReminder: "Morning Routine",
+  fajrReminder: "Fajr Prayer",
+  dhuhrReminder: "Dhuhr Prayer",
+  asrReminder: "Asr Prayer",
+  maghribReminder: "Maghrib Prayer",
+  ishaReminder: "Isha Prayer",
   breakfastReminder: "Breakfast Time",
   lunchReminder: "Lunch Time",
-  exerciseReminder: "Exercise Time",
   dinnerReminder: "Dinner Time",
-  waterReminder: "Water Reminder",
-  sleepReminder: "Bedtime Reminder",
+  morningDuaReminder: "Morning Dua",
+  eveningDuaReminder: "Evening Dua",
+  sleepDuaReminder: "Dua Before Sleep",
 };
+
+const categories = [
+  {
+    id: "salah",
+    titleEn: "Salah Reminders",
+    titleBn: "নামাজের রিমাইন্ডার",
+    icon: "sun" as keyof typeof Feather.glyphMap,
+    color: "#F4D03F",
+    reminders: ["fajr", "dhuhr", "asr", "maghrib", "isha"],
+  },
+  {
+    id: "food",
+    titleEn: "Food Reminders",
+    titleBn: "খাবারের রিমাইন্ডার",
+    icon: "coffee" as keyof typeof Feather.glyphMap,
+    color: "#A8D5A8",
+    reminders: ["breakfast", "lunch", "dinner"],
+  },
+  {
+    id: "duas",
+    titleEn: "Dua Reminders",
+    titleBn: "দোয়ার রিমাইন্ডার",
+    icon: "book" as keyof typeof Feather.glyphMap,
+    color: "#9B59B6",
+    reminders: ["morningDua", "eveningDua", "sleepDua"],
+  },
+];
 
 function BellAnimation() {
   const rotation = useSharedValue(0);
@@ -77,11 +121,14 @@ function BellAnimation() {
   );
 }
 
-export default function RemindersScreen() {
-  const insets = useSafeAreaInsets();
-  const headerHeight = useHeaderHeight();
+interface ReminderCategoryProps {
+  category: typeof categories[0];
+  index: number;
+}
+
+function ReminderCategory({ category, index }: ReminderCategoryProps) {
   const { theme, isDark } = useTheme();
-  const { t, language, reminders, toggleReminder, hasNotificationPermission, requestNotificationPermission } = useApp();
+  const { language, reminders, toggleReminder, hasNotificationPermission, requestNotificationPermission } = useApp();
 
   const handleToggle = async (id: string) => {
     if (!hasNotificationPermission) {
@@ -93,6 +140,77 @@ export default function RemindersScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     toggleReminder(id);
   };
+
+  const getReminderTitle = (titleKey: string) => {
+    if (language === "bn") {
+      return reminderTitlesBn[titleKey] || titleKey;
+    }
+    return reminderTitlesEn[titleKey] || titleKey;
+  };
+
+  const categoryReminders = reminders.filter(r => category.reminders.includes(r.id));
+
+  return (
+    <Animated.View entering={FadeInUp.delay(200 + index * 100).springify()}>
+      <View style={[styles.categoryCard, { backgroundColor: theme.backgroundDefault, borderColor: theme.border }]}>
+        <LinearGradient
+          colors={[category.color + "10", "transparent"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={StyleSheet.absoluteFill}
+        />
+        <View style={styles.categoryHeader}>
+          <View style={[styles.categoryIcon, { backgroundColor: category.color + "20" }]}>
+            <Feather name={category.icon} size={22} color={category.color} />
+          </View>
+          <ThemedText type="h4" style={{ fontFamily: "Nunito_600SemiBold", flex: 1 }}>
+            {language === "bn" ? category.titleBn : category.titleEn}
+          </ThemedText>
+        </View>
+        
+        <View style={styles.remindersList}>
+          {categoryReminders.map((reminder, idx) => (
+            <Pressable
+              key={reminder.id}
+              onPress={() => handleToggle(reminder.id)}
+              style={[
+                styles.reminderRow,
+                {
+                  backgroundColor: reminder.enabled ? reminderColors[reminder.id] + "10" : "transparent",
+                  borderColor: reminder.enabled ? reminderColors[reminder.id] : theme.border,
+                },
+              ]}
+            >
+              <View style={[styles.reminderIcon, { backgroundColor: reminderColors[reminder.id] + "20" }]}>
+                <Feather name={reminderIcons[reminder.id]} size={18} color={reminderColors[reminder.id]} />
+              </View>
+              <View style={styles.reminderInfo}>
+                <ThemedText type="body" style={{ fontFamily: "Nunito_500Medium" }}>
+                  {getReminderTitle(reminder.title)}
+                </ThemedText>
+                <ThemedText type="small" style={{ color: theme.textSecondary, fontFamily: "Nunito_400Regular" }}>
+                  {reminder.time}
+                </ThemedText>
+              </View>
+              <Switch
+                value={reminder.enabled}
+                onValueChange={() => handleToggle(reminder.id)}
+                trackColor={{ false: theme.border, true: reminderColors[reminder.id] + "80" }}
+                thumbColor={reminder.enabled ? reminderColors[reminder.id] : "#fff"}
+              />
+            </Pressable>
+          ))}
+        </View>
+      </View>
+    </Animated.View>
+  );
+}
+
+export default function RemindersScreen() {
+  const insets = useSafeAreaInsets();
+  const headerHeight = useHeaderHeight();
+  const { theme, isDark } = useTheme();
+  const { language, hasNotificationPermission, requestNotificationPermission } = useApp();
 
   const handleEnableNotifications = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -106,15 +224,8 @@ export default function RemindersScreen() {
     }
   };
 
-  const getReminderTitle = (titleKey: string) => {
-    if (language === "bn") {
-      return reminderTitlesBn[titleKey] || titleKey;
-    }
-    return reminderTitlesEn[titleKey] || titleKey;
-  };
-
-  const headerTitle = language === "bn" ? "রিমাইন্ডার" : "Reminders";
-  const headerSubtitle = language === "bn" ? "আপনার রুটিনের জন্য দৈনিক রিমাইন্ডার সেট করুন" : "Set daily reminders for your routine";
+  const headerTitle = language === "bn" ? "রিমাইন্ডার সেটিংস" : "Reminder Settings";
+  const headerSubtitle = language === "bn" ? "নামাজ, খাবার ও দোয়ার রিমাইন্ডার" : "Salah, Food & Dua Reminders";
   const enableNotificationsText = language === "bn" ? "নোটিফিকেশন চালু করুন" : "Enable Notifications";
   const permissionNeededText = language === "bn" ? "রিমাইন্ডার পাঠাতে অনুমতি প্রয়োজন" : "Permission needed to send reminders";
 
@@ -129,22 +240,25 @@ export default function RemindersScreen() {
       scrollIndicatorInsets={{ bottom: insets.bottom }}
       showsVerticalScrollIndicator={true}
     >
-      <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.headerSection}>
-        <Image
-          source={require("../../assets/images/reminder-illustration.png")}
-          style={styles.headerImage}
-          resizeMode="contain"
-        />
-        <ThemedText type="h3" style={{ fontFamily: "Nunito_700Bold", textAlign: "center", marginTop: Spacing.lg }}>
-          {headerTitle}
-        </ThemedText>
-        <ThemedText type="body" style={{ color: theme.textSecondary, textAlign: "center", marginTop: Spacing.xs, fontFamily: "Nunito_400Regular" }}>
-          {headerSubtitle}
-        </ThemedText>
+      <Animated.View entering={FadeInDown.delay(50).springify()} style={styles.headerSection}>
+        <LinearGradient
+          colors={isDark ? [theme.backgroundSecondary, theme.backgroundDefault] : [Colors.light.secondary + "20", Colors.light.primary + "10"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.headerGradient}
+        >
+          <Feather name="bell" size={48} color={Colors.light.secondary} />
+          <ThemedText type="h3" style={{ fontFamily: "Nunito_700Bold", textAlign: "center", marginTop: Spacing.md }}>
+            {headerTitle}
+          </ThemedText>
+          <ThemedText type="body" style={{ color: theme.textSecondary, textAlign: "center", marginTop: Spacing.xs, fontFamily: "Nunito_400Regular" }}>
+            {headerSubtitle}
+          </ThemedText>
+        </LinearGradient>
       </Animated.View>
 
       {!hasNotificationPermission && Platform.OS !== "web" ? (
-        <Animated.View entering={FadeInDown.delay(200).springify()}>
+        <Animated.View entering={FadeInDown.delay(100).springify()}>
           <Pressable
             onPress={handleEnableNotifications}
             style={[styles.permissionCard, { backgroundColor: Colors.light.primary + "15", borderColor: Colors.light.primary }]}
@@ -162,53 +276,23 @@ export default function RemindersScreen() {
         </Animated.View>
       ) : null}
 
-      <View style={styles.remindersContainer}>
-        {reminders.map((reminder, index) => (
-          <Animated.View key={reminder.id} entering={FadeInUp.delay(300 + index * 80).springify()}>
-            <Pressable
-              onPress={() => handleToggle(reminder.id)}
-              style={[
-                styles.reminderCard,
-                {
-                  backgroundColor: theme.backgroundDefault,
-                  borderColor: reminder.enabled ? reminderColors[reminder.id] : theme.border,
-                  borderWidth: reminder.enabled ? 2 : 1,
-                },
-              ]}
-            >
-              <View style={[styles.reminderIcon, { backgroundColor: reminderColors[reminder.id] + "20" }]}>
-                <Feather name={reminderIcons[reminder.id]} size={24} color={reminderColors[reminder.id]} />
-              </View>
-              <View style={styles.reminderInfo}>
-                <ThemedText type="body" style={{ fontFamily: "Nunito_600SemiBold" }}>
-                  {getReminderTitle(reminder.title)}
-                </ThemedText>
-                <ThemedText type="small" style={{ color: theme.textSecondary, fontFamily: "Nunito_400Regular" }}>
-                  {reminder.time}
-                </ThemedText>
-              </View>
-              <Switch
-                value={reminder.enabled}
-                onValueChange={() => handleToggle(reminder.id)}
-                trackColor={{ false: theme.border, true: reminderColors[reminder.id] + "80" }}
-                thumbColor={reminder.enabled ? reminderColors[reminder.id] : "#fff"}
-              />
-            </Pressable>
-          </Animated.View>
-        ))}
-      </View>
+      {categories.map((category, index) => (
+        <View key={category.id} style={{ marginBottom: Spacing.md }}>
+          <ReminderCategory category={category} index={index} />
+        </View>
+      ))}
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   headerSection: {
-    alignItems: "center",
     marginBottom: Spacing.xl,
   },
-  headerImage: {
-    width: 120,
-    height: 120,
+  headerGradient: {
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.xl,
+    alignItems: "center",
   },
   permissionCard: {
     borderRadius: BorderRadius.lg,
@@ -220,19 +304,39 @@ const styles = StyleSheet.create({
   permissionContent: {
     alignItems: "center",
   },
-  remindersContainer: {
-    gap: Spacing.md,
-  },
-  reminderCard: {
-    flexDirection: "row",
-    alignItems: "center",
+  categoryCard: {
     borderRadius: BorderRadius.lg,
     padding: Spacing.lg,
+    borderWidth: 1,
+    overflow: "hidden",
   },
-  reminderIcon: {
+  categoryHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: Spacing.md,
+  },
+  categoryIcon: {
     width: 48,
     height: 48,
     borderRadius: BorderRadius.sm,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: Spacing.md,
+  },
+  remindersList: {
+    gap: Spacing.sm,
+  },
+  reminderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: Spacing.md,
+    borderRadius: BorderRadius.sm,
+    borderWidth: 1,
+  },
+  reminderIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: BorderRadius.xs,
     alignItems: "center",
     justifyContent: "center",
   },

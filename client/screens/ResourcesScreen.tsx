@@ -261,17 +261,6 @@ export default function ResourcesScreen() {
       />
       <View style={{ height: Spacing.md }} />
 
-      <ResourceCard
-        title={t("reminders")}
-        description={t("reminderSubtitle")}
-        icon="bell"
-        gradientColors={["#FFB347" + "10", "transparent"]}
-        iconColor="#FFB347"
-        onPress={() => navigation.navigate("Reminders")}
-        index={3}
-        viewDetailsText={viewDetailsText}
-        compact
-      />
     </ScrollView>
   );
 }
