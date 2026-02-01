@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FlatList, View, StyleSheet, Pressable, Image } from "react-native";
+import { FlatList, View, StyleSheet, Pressable, Image, ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
