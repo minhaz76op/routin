@@ -43,7 +43,7 @@ interface AppContextType {
   toggleRoutineComplete: (routineId: string) => void;
   isRoutineCompleted: (routineId: string) => boolean;
   getTodayCompletedCount: () => number;
-  stats: { daily: number, weekly: number, monthly: number };
+  stats: { daily: number, weekly: number, monthly: number, breakdown: Record<string, number> };
   fetchStats: () => Promise<void>;
 }
 
@@ -288,7 +288,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [reminders, setRemindersState] = useState<Reminder[]>(defaultReminders);
   const [hasNotificationPermission, setHasNotificationPermission] = useState(false);
   const [completedRoutines, setCompletedRoutines] = useState<CompletedRoutines>({});
-  const [stats, setStats] = useState({ daily: 0, weekly: 0, monthly: 0 });
+  const [stats, setStats] = useState({ daily: 0, weekly: 0, monthly: 0, breakdown: {} as Record<string, number> });
 
   const fetchStats = useCallback(async () => {
     try {

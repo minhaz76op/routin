@@ -29,7 +29,7 @@ export class MemStorage implements IStorage {
     this.checkins.push({ routineId, timestamp: new Date() });
   }
 
-  async getCheckInData(): Promise<{daily: number, weekly: number, monthly: number}> {
+  async getCheckInData(): Promise<{daily: number, weekly: number, monthly: number, breakdown: Record<string, number>}> {
     const now = new Date();
     const oneDay = 24 * 60 * 60 * 1000;
     const oneWeek = 7 * oneDay;
@@ -39,7 +39,12 @@ export class MemStorage implements IStorage {
     const weekly = this.checkins.filter(c => now.getTime() - c.timestamp.getTime() < oneWeek).length;
     const monthly = this.checkins.filter(c => now.getTime() - c.timestamp.getTime() < oneMonth).length;
 
-    return { daily, weekly, monthly };
+    const breakdown: Record<string, number> = {};
+    this.checkins.forEach(c => {
+      breakdown[c.routineId] = (breakdown[c.routineId] || 0) + 1;
+    });
+
+    return { daily, weekly, monthly, breakdown };
   }
 
   async getUser(id: string): Promise<User | undefined> {

@@ -308,6 +308,28 @@ function WelcomeHeader() {
               <ThemedText type="small" style={styles.statLabel}>{language === "bn" ? "মাসিক" : "Monthly"}</ThemedText>
             </View>
           </View>
+
+          <View style={styles.detailedBreakdown}>
+            <ThemedText type="small" style={styles.breakdownTitle}>
+              {language === "bn" ? "রুটিন ভিত্তিক অগ্রগতি" : "Routine Breakdown"}
+            </ThemedText>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.breakdownScroll}>
+              {routineData.map((item) => {
+                const count = stats.breakdown[item.id] || 0;
+                return (
+                  <View key={item.id} style={styles.breakdownItem}>
+                    <View style={[styles.breakdownIcon, { backgroundColor: item.color + "20" }]}>
+                      <Feather name={item.icon} size={14} color={item.color} />
+                    </View>
+                    <ThemedText style={styles.breakdownCount}>{count}</ThemedText>
+                    <ThemedText type="small" style={styles.breakdownLabel} numberOfLines={1}>
+                      {t(item.timeKey)}
+                    </ThemedText>
+                  </View>
+                );
+              })}
+            </ScrollView>
+          </View>
         </View>
       </LinearGradient>
     </Animated.View>
@@ -559,6 +581,41 @@ const styles = StyleSheet.create({
     fontFamily: "Nunito_400Regular",
     color: "rgba(0,0,0,0.5)",
     fontSize: 10,
+  },
+  detailedBreakdown: {
+    marginTop: Spacing.md,
+    paddingTop: Spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(0,0,0,0.05)",
+  },
+  breakdownTitle: {
+    fontFamily: "Nunito_600SemiBold",
+    marginBottom: Spacing.sm,
+    color: "rgba(0,0,0,0.6)",
+  },
+  breakdownScroll: {
+    flexDirection: "row",
+  },
+  breakdownItem: {
+    alignItems: "center",
+    marginRight: Spacing.md,
+    width: 60,
+  },
+  breakdownIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 4,
+  },
+  breakdownCount: {
+    fontFamily: "Nunito_700Bold",
+    fontSize: 12,
+  },
+  breakdownLabel: {
+    fontSize: 8,
+    textAlign: "center",
   },
   card: {
     borderRadius: BorderRadius.lg,
