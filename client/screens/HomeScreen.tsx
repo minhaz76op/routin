@@ -224,6 +224,13 @@ function WelcomeHeader() {
   const [greetingIcon, setGreetingIcon] = useState<keyof typeof Feather.glyphMap>(getGreetingIcon());
   const completedCount = getTodayCompletedCount();
   const totalRoutines = routineData.length;
+
+  const today = new Date();
+  const dateStr = today.toLocaleDateString(language === "bn" ? "bn-BD" : "en-US", {
+    day: "numeric",
+    month: "long",
+    weekday: "long",
+  });
   
   useEffect(() => {
     setGreeting(getGreeting(language));
@@ -263,6 +270,9 @@ function WelcomeHeader() {
               {greeting}
             </ThemedText>
           </View>
+          <ThemedText type="small" style={{ color: Colors.light.primary, fontFamily: "Nunito_600SemiBold", marginTop: 2 }}>
+            {dateStr}
+          </ThemedText>
           <ThemedText type="body" style={{ color: theme.textSecondary, marginTop: Spacing.xs, fontFamily: "Nunito_400Regular" }}>
             {t("stayHealthy")}
           </ThemedText>

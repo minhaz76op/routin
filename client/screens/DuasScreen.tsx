@@ -24,6 +24,96 @@ interface Dua {
   icon: keyof typeof Feather.glyphMap;
   color: string;
   category: string;
+  audioUrl?: string;
+}
+
+function DuaCard({ item, index }: { item: Dua; index: number }) {
+  const { theme } = useTheme();
+  const { language } = useApp();
+  const [playing, setPlaying] = useState(false);
+  const [sound, setSound] = useState<Audio.Sound | null>(null);
+  const scale = useSharedValue(1);
+
+  async function playSound() {
+    if (!item.audioUrl) {
+      alert("Audio not available for this Dua");
+      return;
+    }
+    
+    try {
+      if (sound) {
+        await sound.unloadAsync();
+      }
+      
+      setPlaying(true);
+      const { sound: newSound } = await Audio.Sound.createAsync(
+        { uri: item.audioUrl },
+        { shouldPlay: true }
+      );
+      setSound(newSound);
+      
+      newSound.setOnPlaybackStatusUpdate((status: AVPlaybackStatus) => {
+        if (status.isLoaded && status.didJustFinish) {
+          setPlaying(false);
+        }
+      });
+    } catch (error) {
+      console.error("Error playing sound", error);
+      setPlaying(false);
+    }
+  }
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const handlePress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    scale.value = withSpring(0.98, { damping: 15, stiffness: 150 });
+    setTimeout(() => {
+      scale.value = withSpring(1, { damping: 15, stiffness: 150 });
+    }, 100);
+  };
+
+  const getText = (textItem: { en: string; bn: string }) => language === "bn" ? textItem.bn : textItem.en;
+
+  return (
+    <Animated.View entering={FadeInUp.delay(100 + index * 50).springify()}>
+      <Pressable onPress={handlePress}>
+        <Animated.View style={[styles.card, { backgroundColor: theme.backgroundDefault }, animatedStyle]}>
+          <View style={styles.cardHeader}>
+            <View style={[styles.iconContainer, { backgroundColor: item.color + "20" }]}>
+              <Feather name={item.icon} size={22} color={item.color} />
+            </View>
+            <ThemedText type="h4" style={{ flex: 1, marginLeft: Spacing.md, fontFamily: "Nunito_600SemiBold" }}>
+              {getText(item.title)}
+            </ThemedText>
+            <Pressable 
+              onPress={playSound}
+              style={[styles.audioButton, { backgroundColor: item.color + "20" }]}
+            >
+              {playing ? (
+                <ActivityIndicator size="small" color={item.color} />
+              ) : (
+                <Feather name="play" size={18} color={item.color} />
+              )}
+            </Pressable>
+          </View>
+          
+          <View style={styles.cardContent}>
+            <ThemedText style={styles.arabicText}>{item.arabic}</ThemedText>
+            <ThemedText style={[styles.transliteration, { color: theme.textSecondary }]}>{item.transliteration}</ThemedText>
+            <View style={styles.meaningContainer}>
+              <Feather name="info" size={14} color={item.color} style={{ marginTop: 3, marginRight: 8 }} />
+              <ThemedText type="body" style={{ flex: 1, color: theme.textDefault, fontFamily: "Nunito_400Regular" }}>
+                {getText(item.meaning)}
+              </ThemedText>
+            </View>
+          </View>
+        </Animated.View>
+      </Pressable>
+    </Animated.View>
+  );
 }
 
 const duas: Dua[] = [
