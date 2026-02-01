@@ -7,9 +7,10 @@ Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
     shouldPlaySound: true,
-    shouldSetBadge: false,
+    shouldSetBadge: true,
     shouldShowBanner: true,
     shouldShowList: true,
+    priority: Notifications.AndroidNotificationPriority.MAX,
   }),
 });
 
@@ -409,6 +410,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
         content: {
           title: translations[language][reminder.title] || reminder.title,
           body: translations[language].stayHealthy,
+          sound: true,
+          priority: Notifications.AndroidNotificationPriority.MAX,
+          categoryIdentifier: "alarm",
         },
         trigger: {
           type: Notifications.SchedulableTriggerInputTypes.DAILY,
