@@ -130,6 +130,7 @@ const duas: Dua[] = [
     icon: "sunrise",
     color: "#FFB347",
     category: "morning",
+    audioUrl: "https://www.islamcan.com/audio/duas/wake-up.mp3",
   },
   {
     id: "2",
@@ -144,6 +145,7 @@ const duas: Dua[] = [
     icon: "sun",
     color: "#F4D03F",
     category: "morning",
+    audioUrl: "https://www.islamcan.com/audio/duas/morning-dua.mp3",
   },
   {
     id: "3",
@@ -158,6 +160,7 @@ const duas: Dua[] = [
     icon: "sunset",
     color: "#E67E22",
     category: "evening",
+    audioUrl: "https://www.islamcan.com/audio/duas/evening-dua.mp3",
   },
   {
     id: "4",
