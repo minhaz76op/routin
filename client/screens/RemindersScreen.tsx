@@ -189,7 +189,12 @@ function ReminderCategory({ category, index }: ReminderCategoryProps) {
                   {getReminderTitle(reminder.title)}
                 </ThemedText>
                 <ThemedText type="small" style={{ color: theme.textSecondary, fontFamily: "Nunito_400Regular" }}>
-                  {reminder.time}
+                  {(() => {
+                    const [hours, minutes] = reminder.time.split(":").map(Number);
+                    const ampm = hours >= 12 ? "PM" : "AM";
+                    const h12 = hours % 12 || 12;
+                    return `${h12}:${minutes.toString().padStart(2, "0")} ${ampm}`;
+                  })()}
                 </ThemedText>
               </View>
               <Switch
