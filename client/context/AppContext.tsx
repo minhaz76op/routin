@@ -292,8 +292,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const getTodayKey = () => {
-    const today = new Date();
-    return `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+    // Bangladesh is UTC+6
+    const now = new Date();
+    const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+    const bdTime = new Date(utc + (3600000 * 6));
+    return `${bdTime.getFullYear()}-${bdTime.getMonth() + 1}-${bdTime.getDate()}`;
   };
 
   const loadSettings = async () => {
@@ -383,15 +386,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
     await AsyncStorage.setItem("reminders", JSON.stringify(updated));
     
     const reminder = updated.find((r) => r.id === id);
-    if (reminder?.enabled && hasNotificationPermission) {
-      const [hours, minutes] = reminder.time.split(":").map(Number);
-      const trigger = new Date();
-      trigger.setHours(hours, minutes, 0, 0);
-      if (trigger <= new Date()) {
-        trigger.setDate(trigger.getDate() + 1);
-      }
-      
-      await Notifications.scheduleNotificationAsync({
+      if (reminder?.enabled && hasNotificationPermission) {
+        const [hours, minutes] = reminder.time.split(":").map(Number);
+        
+        // Use Bangladesh Time (UTC+6) for calculation
+        const now = new Date();
+        const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+        const bdNow = new Date(utc + (3600000 * 6));
+        
+        const trigger = new Date(bdNow);
+        trigger.setHours(hours, minutes, 0, 0);
+        
+        if (trigger <= bdNow) {
+          trigger.setDate(trigger.getDate() + 1);
+        }
+        
+        // Convert back to system time for notification scheduler
+        const triggerUtc = trigger.getTime() - (3600000 * 6);
+        const systemTrigger = new Date(triggerUtc - (now.getTimezoneOffset() * 60000));
+
+        await Notifications.scheduleNotificationAsync({
         content: {
           title: translations[language][reminder.title] || reminder.title,
           body: translations[language].stayHealthy,
