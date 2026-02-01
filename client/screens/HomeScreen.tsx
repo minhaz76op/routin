@@ -292,6 +292,9 @@ function WelcomeHeader() {
             <ThemedText type="small" style={{ color: theme.textSecondary, marginTop: Spacing.xs, fontFamily: "Nunito_400Regular" }}>
               {completedCount}/{totalRoutines} {t("completed")}
             </ThemedText>
+            <ThemedText type="small" style={{ color: Colors.light.primary, fontFamily: "Nunito_700Bold", marginTop: 4 }}>
+              {language === "bn" ? "আপনার কাজের " : "Your complete "}{Math.round((completedCount / totalRoutines) * 100)}% {language === "bn" ? "সম্পন্ন হয়েছে" : "of your task"}
+            </ThemedText>
           </View>
 
           <View style={styles.statsContainer}>
