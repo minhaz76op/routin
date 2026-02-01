@@ -301,14 +301,17 @@ function WelcomeHeader() {
             <View style={styles.statItem}>
               <ThemedText type="h4" style={styles.statValue}>{stats.daily}</ThemedText>
               <ThemedText type="small" style={styles.statLabel}>{language === "bn" ? "দৈনিক" : "Daily"}</ThemedText>
+              <ThemedText type="small" style={styles.statPercentage}>{Math.round((stats.daily / totalRoutines) * 100)}%</ThemedText>
             </View>
             <View style={styles.statItem}>
               <ThemedText type="h4" style={styles.statValue}>{stats.weekly}</ThemedText>
               <ThemedText type="small" style={styles.statLabel}>{language === "bn" ? "সাপ্তাহিক" : "Weekly"}</ThemedText>
+              <ThemedText type="small" style={styles.statPercentage}>{Math.round((stats.weekly / (totalRoutines * 7)) * 100)}%</ThemedText>
             </View>
             <View style={styles.statItem}>
               <ThemedText type="h4" style={styles.statValue}>{stats.monthly}</ThemedText>
               <ThemedText type="small" style={styles.statLabel}>{language === "bn" ? "মাসিক" : "Monthly"}</ThemedText>
+              <ThemedText type="small" style={styles.statPercentage}>{Math.round((stats.monthly / (totalRoutines * 30)) * 100)}%</ThemedText>
             </View>
           </View>
 
@@ -584,6 +587,12 @@ const styles = StyleSheet.create({
     fontFamily: "Nunito_400Regular",
     color: "rgba(0,0,0,0.5)",
     fontSize: 10,
+  },
+  statPercentage: {
+    fontFamily: "Nunito_700Bold",
+    color: Colors.light.primary,
+    fontSize: 10,
+    marginTop: 2,
   },
   detailedBreakdown: {
     marginTop: Spacing.md,
