@@ -10,15 +10,36 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   createCheckout(checkout: InsertCheckout): Promise<Checkout>;
   getCheckouts(): Promise<Checkout[]>;
+  createCheckIn(routineId: string): Promise<void>;
+  getCheckInData(): Promise<{daily: number, weekly: number, monthly: number}>;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<string, User>;
   private checkouts: Map<string, Checkout>;
+  private checkins: { routineId: string, timestamp: Date }[];
 
   constructor() {
     this.users = new Map();
     this.checkouts = new Map();
+    this.checkins = [];
+  }
+
+  async createCheckIn(routineId: string): Promise<void> {
+    this.checkins.push({ routineId, timestamp: new Date() });
+  }
+
+  async getCheckInData(): Promise<{daily: number, weekly: number, monthly: number}> {
+    const now = new Date();
+    const oneDay = 24 * 60 * 60 * 1000;
+    const oneWeek = 7 * oneDay;
+    const oneMonth = 30 * oneDay;
+
+    const daily = this.checkins.filter(c => now.getTime() - c.timestamp.getTime() < oneDay).length;
+    const weekly = this.checkins.filter(c => now.getTime() - c.timestamp.getTime() < oneWeek).length;
+    const monthly = this.checkins.filter(c => now.getTime() - c.timestamp.getTime() < oneMonth).length;
+
+    return { daily, weekly, monthly };
   }
 
   async getUser(id: string): Promise<User | undefined> {

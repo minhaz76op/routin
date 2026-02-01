@@ -219,7 +219,7 @@ function FloatingHeart({ delay }: { delay: number }) {
 
 function WelcomeHeader() {
   const { theme, isDark } = useTheme();
-  const { t, language, getTodayCompletedCount } = useApp();
+  const { t, language, getTodayCompletedCount, stats } = useApp();
   const [greeting, setGreeting] = useState(getGreeting(language));
   const [greetingIcon, setGreetingIcon] = useState<keyof typeof Feather.glyphMap>(getGreetingIcon());
   const completedCount = getTodayCompletedCount();
@@ -292,6 +292,21 @@ function WelcomeHeader() {
             <ThemedText type="small" style={{ color: theme.textSecondary, marginTop: Spacing.xs, fontFamily: "Nunito_400Regular" }}>
               {completedCount}/{totalRoutines} {t("completed")}
             </ThemedText>
+          </View>
+
+          <View style={styles.statsContainer}>
+            <View style={styles.statItem}>
+              <ThemedText type="h4" style={styles.statValue}>{stats.daily}</ThemedText>
+              <ThemedText type="small" style={styles.statLabel}>{language === "bn" ? "দৈনিক" : "Daily"}</ThemedText>
+            </View>
+            <View style={styles.statItem}>
+              <ThemedText type="h4" style={styles.statValue}>{stats.weekly}</ThemedText>
+              <ThemedText type="small" style={styles.statLabel}>{language === "bn" ? "সাপ্তাহিক" : "Weekly"}</ThemedText>
+            </View>
+            <View style={styles.statItem}>
+              <ThemedText type="h4" style={styles.statValue}>{stats.monthly}</ThemedText>
+              <ThemedText type="small" style={styles.statLabel}>{language === "bn" ? "মাসিক" : "Monthly"}</ThemedText>
+            </View>
           </View>
         </View>
       </LinearGradient>
@@ -523,6 +538,27 @@ const styles = StyleSheet.create({
   progressFill: {
     height: "100%",
     borderRadius: 4,
+  },
+  statsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: Spacing.lg,
+    paddingTop: Spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(0,0,0,0.05)",
+  },
+  statItem: {
+    alignItems: "center",
+    flex: 1,
+  },
+  statValue: {
+    fontFamily: "Nunito_700Bold",
+    color: Colors.light.primary,
+  },
+  statLabel: {
+    fontFamily: "Nunito_400Regular",
+    color: "rgba(0,0,0,0.5)",
+    fontSize: 10,
   },
   card: {
     borderRadius: BorderRadius.lg,

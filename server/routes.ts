@@ -25,6 +25,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/checkins", async (req, res) => {
+    try {
+      const { routineId } = req.body;
+      await storage.createCheckIn(routineId);
+      res.sendStatus(200);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create check-in" });
+    }
+  });
+
+  app.get("/api/dashboard/stats", async (req, res) => {
+    try {
+      const stats = await storage.getCheckInData();
+      res.json(stats);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch dashboard stats" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

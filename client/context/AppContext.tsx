@@ -43,6 +43,8 @@ interface AppContextType {
   toggleRoutineComplete: (routineId: string) => void;
   isRoutineCompleted: (routineId: string) => boolean;
   getTodayCompletedCount: () => number;
+  stats: { daily: number, weekly: number, monthly: number };
+  fetchStats: () => Promise<void>;
 }
 
 const translations: Record<Language, Record<string, string>> = {
@@ -286,10 +288,24 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [reminders, setRemindersState] = useState<Reminder[]>(defaultReminders);
   const [hasNotificationPermission, setHasNotificationPermission] = useState(false);
   const [completedRoutines, setCompletedRoutines] = useState<CompletedRoutines>({});
+  const [stats, setStats] = useState({ daily: 0, weekly: 0, monthly: 0 });
+
+  const fetchStats = useCallback(async () => {
+    try {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_DOMAIN}/api/dashboard/stats`);
+      if (response.ok) {
+        const data = await response.json();
+        setStats(data);
+      }
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+    }
+  }, []);
 
   useEffect(() => {
     loadSettings();
     checkNotificationPermission();
+    fetchStats();
   }, []);
 
   const getTodayKey = () => {
@@ -367,7 +383,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const newState = { ...completedRoutines, [todayKey]: updated };
     setCompletedRoutines(newState);
     await AsyncStorage.setItem("completedRoutines", JSON.stringify(newState));
-  }, [completedRoutines]);
+
+    // Record check-in to server
+    try {
+      await fetch(`${process.env.EXPO_PUBLIC_DOMAIN}/api/checkins`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ routineId }),
+      });
+      fetchStats();
+    } catch (error) {
+      console.error("Error recording check-in:", error);
+    }
+  }, [completedRoutines, fetchStats]);
 
   const isRoutineCompleted = useCallback((routineId: string) => {
     const todayKey = getTodayKey();
@@ -447,6 +475,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         toggleRoutineComplete,
         isRoutineCompleted,
         getTodayCompletedCount,
+        stats,
+        fetchStats,
       }}
     >
       {children}
