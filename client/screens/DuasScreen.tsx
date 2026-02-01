@@ -363,6 +363,34 @@ const duas: Dua[] = [
     color: "#E8A5A5",
     category: "daily",
   },
+  {
+    id: "25",
+    titleKey: "tahajjudDua",
+    title: { en: "Dua for Tahajjud", bn: "তাহাজ্জুদের দোয়া" },
+    arabic: "اللَّهُمَّ لَكَ الْحَمْدُ أَنْتَ قَيِّمُ السَّمَوَاتِ وَالأَرْضِ وَمَنْ فِيهِنَّ",
+    transliteration: "Allahumma lakal-hamdu Anta qayyimus-samawati wal-ardi wa man fihinna",
+    meaning: {
+      en: "O Allah, to You belongs all praise, You are the Sustainer of the heavens and the earth and whoever is in them.",
+      bn: "হে আল্লাহ, সকল প্রশংসা আপনারই জন্য, আপনি আসমান ও জমিন এবং এর মধ্যস্থিত সকলের ধারক।"
+    },
+    icon: "moon",
+    color: "#7C7CD9",
+    category: "daily",
+  },
+  {
+    id: "26",
+    titleKey: "salahDua",
+    title: { en: "Dua After Salah", bn: "নামাজের পরের দোয়া" },
+    arabic: "اللَّهُمَّ أَنْتَ السَّلاَمُ وَمِنْكَ السَّلاَمُ تَبَارَكْتَ يَا ذَا الْجَلاَلِ وَالإِكْرَامِ",
+    transliteration: "Allahumma Antas-Salamu wa minkas-salamu tabarakta ya dhal-Jalali wal-Ikram",
+    meaning: {
+      en: "O Allah, You are Peace and from You comes peace. Blessed are You, O Owner of Majesty and Honor.",
+      bn: "হে আল্লাহ, আপনিই শান্তি এবং আপনার থেকেই শান্তি আসে। আপনি বরকতময়, হে মহিমা ও সম্মানের অধিকারী।"
+    },
+    icon: "sun",
+    color: "#F4D03F",
+    category: "daily",
+  },
 ];
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
