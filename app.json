@@ -19,7 +19,12 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.routineforjuhi.app"
+      "package": "com.routineforjuhi.app",
+      "softwareKeyboardLayoutMode": "pan",
+      "navigationBar": {
+        "visible": "sticky-immersive",
+        "backgroundColor": "#00000000"
+      }
     },
     "web": {
       "output": "single",
