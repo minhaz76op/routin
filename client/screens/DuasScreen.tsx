@@ -33,6 +33,37 @@ interface DuaCategory {
 
 const duaCategories: DuaCategory[] = [
   {
+    id: "quran-protection",
+    title: { en: "Protection from Quran", bn: "কুরআনের সুরক্ষা" },
+    icon: "shield",
+    iconColor: "#7C7CD9",
+    duas: [
+      {
+        id: "ayatul-kursi",
+        titleKey: "ayatulKursi",
+        title: { en: "Ayatul Kursi", bn: "আয়াতুল কুরসি" },
+        arabic: "اللَّهُ لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ مَنْ ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلَّا بِإِذْنِهِ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ وَلَا يُحِيطُونَ بِشَيْءٍ مِنْ عِلْمِهِ إِلَّا بِمَا شَاءَ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ وَلَا يَئُودُهُ حِفْظُهُمَا وَهُوَ الْعَلِيُّ الْعَظِيمُ",
+        transliteration: "Allahu la ilaha illa Huwa, Al-Hayyul-Qayyum. La ta'khudhuhu sinatun wa la nawm. Lahu ma fis-samawati wa ma fil-ard. Man dhal-ladhi yashfa'u 'indahu illa bi-idhnihi? Ya'lamu ma bayna aydihim wa ma khalfahum. Wa la yuhituna bi-shay'im-min 'ilmihi illa bi-ma sha'. Wasi'a kursiyyuhus-samawati wal-ard. Wa la ya'uduhu hifdhuhuma wa Huwal-'Aliyyul-'Adhim.",
+        meaning: {
+          en: "Allah! There is no god but He, the Living, the Self-subsisting, Eternal. No slumber can seize Him nor sleep. His are all things in the heavens and on earth.",
+          bn: "আল্লাহ ছাড়া অন্য কোন উপাস্য নেই, তিনি জীবিত ও সবকিছুর ধারক। তাঁকে তন্দ্রা ও নিদ্রা স্পর্শ করে না। আসমান ও যমীনে যা কিছু আছে সব তাঁরই।"
+        },
+        audioUrl: "https://archive.org/download/islamic-dua-in-audio/ayatul-kursi.ogg",
+      },
+      {
+        id: "ikhlas",
+        titleKey: "surahIkhlas",
+        title: { en: "Surah Al-Ikhlas", bn: "সূরা আল-ইখলাস" },
+        arabic: "قُلْ هُوَ اللَّهُ أَحَدٌ اللَّهُ الصَّمَدُ لَمْ يَلِدْ وَلَمْ يُولَدْ وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ",
+        transliteration: "Qul huwallahu ahad. Allahus-samad. Lam yalid wa lam yulad. Wa lam yakun lahu kufuwan ahad.",
+        meaning: {
+          en: "Say, 'He is Allah, [who is] One. Allah, the Eternal Refuge. He neither begets nor is born, Nor is there to Him any equivalent.'",
+          bn: "বলুন, তিনি আল্লাহ, এক। আল্লাহ অমুখাপেক্ষী। তিনি কাউকে জন্ম দেননি এবং কেউ তাঁকে জন্ম দেয়নি এবং তাঁর সমতুল্য কেউ নেই।"
+        },
+      },
+    ],
+  },
+  {
     id: "morning-evening",
     title: { en: "Morning & Evening", bn: "সকাল ও সন্ধ্যা" },
     icon: "sunrise",
@@ -198,13 +229,54 @@ const duaCategories: DuaCategory[] = [
         id: "12",
         titleKey: "drinkingWaterDua",
         title: { en: "Dua After Drinking Water", bn: "পানি পানের পর দোয়া" },
-        arabic: "الْحَمْدُ لِلَّهِ الَّذِي سَقَانَا عَذْبًا فُرَاتًا بِرَحْمَتِهِ",
+        arabic: "الْحَمْدُ لِلَّهِ الَّذِي سَقَانَا عَذْبًا فُرَاتًا بِরَحْمَتِهِ",
         transliteration: "Alhamdulillahil-ladhi saqana 'adhban furatan bi-rahmatihi",
         meaning: {
           en: "All praise is for Allah who gave us sweet water to drink by His mercy.",
           bn: "সমস্ত প্রশংসা আল্লাহর জন্য যিনি তাঁর রহমতে আমাদের মিষ্টি পানি পান করিয়েছেন।"
         },
         audioUrl: "https://archive.org/download/islamic-dua-in-audio/dua-after-drinking-water.ogg",
+      },
+      {
+        id: "13",
+        titleKey: "milkDua",
+        title: { en: "Dua After Drinking Milk", bn: "দুধ পানের পর দোয়া" },
+        arabic: "اللَّهُمَّ بَارِكْ لَنَا فِيهِ وَزِدْنَا مِنْهُ",
+        transliteration: "Allahumma barik lana fihi wa zidna minhu",
+        meaning: {
+          en: "O Allah, bless us in it and give us more of it.",
+          bn: "হে আল্লাহ, এতে আমাদের বরকত দিন এবং আরও বৃদ্ধি করে দিন।"
+        },
+      },
+    ],
+  },
+  {
+    id: "success-knowledge",
+    title: { en: "Success & Knowledge", bn: "সফলতা ও জ্ঞান" },
+    icon: "book",
+    iconColor: "#F4D03F",
+    duas: [
+      {
+        id: "14",
+        titleKey: "knowledgeDua",
+        title: { en: "Dua for Knowledge", bn: "জ্ঞানের জন্য দোয়া" },
+        arabic: "رَّبِّ زِدْنِي عِلْمًا",
+        transliteration: "Rabbi zidni 'ilma",
+        meaning: {
+          en: "My Lord, increase me in knowledge.",
+          bn: "হে আমার রব, আমার জ্ঞান বৃদ্ধি করে দিন।"
+        },
+      },
+      {
+        id: "15",
+        titleKey: "easeDua",
+        title: { en: "Dua for Ease in Tasks", bn: "কাজে সহজতার দোয়া" },
+        arabic: "رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي",
+        transliteration: "Rabbi-shrah li sadri, wa yassir li amri",
+        meaning: {
+          en: "My Lord, expand for me my chest [with assurance] and ease for me my task.",
+          bn: "হে আমার রব, আমার বক্ষ প্রশস্ত করে দিন এবং আমার কাজ সহজ করে দিন।"
+        },
       },
     ],
   },
