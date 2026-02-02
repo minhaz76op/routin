@@ -48,7 +48,7 @@ const duaCategories: DuaCategory[] = [
           en: "All praise is for Allah who gave us life after having taken it from us.",
           bn: "সমস্ত প্রশংসা আল্লাহর জন্য যিনি আমাদের মৃত্যুর পর জীবিত করেছেন।"
         },
-        audioUrl: "https://www.islamcan.com/audio/duas/wake-up.mp3",
+        audioUrl: "https://archive.org/download/islamic-dua-in-audio/dua-after-waking-up-from-sleep.ogg",
       },
       {
         id: "2",
@@ -60,7 +60,7 @@ const duaCategories: DuaCategory[] = [
           en: "O Allah, by Your leave we have reached the morning, by Your leave we live and die.",
           bn: "হে আল্লাহ, আপনার অনুমতিতে আমরা সকালে উঠেছি, আপনার অনুমতিতে আমরা বাঁচি ও মরি।"
         },
-        audioUrl: "https://www.islamcan.com/audio/duas/morning-dua.mp3",
+        audioUrl: "https://archive.org/download/islamic-dua-in-audio/dua-at-the-time-of-sunrise.ogg",
       },
       {
         id: "3",
@@ -72,7 +72,19 @@ const duaCategories: DuaCategory[] = [
           en: "O Allah, by Your leave we have reached the evening, by Your leave we live and die.",
           bn: "হে আল্লাহ, আপনার অনুমতিতে আমরা সন্ধ্যায় পৌঁছেছি, আপনার অনুমতিতে আমরা বাঁচি ও মরি।"
         },
-        audioUrl: "https://www.islamcan.com/audio/duas/evening-dua.mp3",
+        audioUrl: "https://archive.org/download/islamic-dua-in-audio/dua-at-the-time-of-sunset.ogg",
+      },
+      {
+        id: "10",
+        titleKey: "sleepDua",
+        title: { en: "Dua Before Sleeping", bn: "ঘুমানোর আগে দোয়া" },
+        arabic: "بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا",
+        transliteration: "Bismika Allahumma amutu wa ahya",
+        meaning: {
+          en: "In Your name, O Allah, I die and I live.",
+          bn: "হে আল্লাহ, আপনার নামে আমি মৃত্যু বরণ করি এবং জীবিত হই।"
+        },
+        audioUrl: "https://archive.org/download/islamic-dua-in-audio/dua-before-sleeping.ogg",
       },
     ],
   },
@@ -92,6 +104,19 @@ const duaCategories: DuaCategory[] = [
           en: "O Allah, grant me health in my body, hearing, and sight.",
           bn: "হে আল্লাহ, আমার শরীরে, শ্রবণে ও দৃষ্টিতে সুস্থতা দান করুন।"
         },
+        audioUrl: "https://archive.org/download/islamic-dua-in-audio/dua-to-be-recited-while-feeling-sick.ogg",
+      },
+      {
+        id: "11",
+        titleKey: "clothesDua",
+        title: { en: "Dua After Wearing Clothes", bn: "কাপড় পরার পর দোয়া" },
+        arabic: "الْحَمْدُ لِلَّهِ الَّذِي كَسَانِي هَذَا وَرَزَقَنِيهِ مِنْ غَيْرِ حَوْلٍ مِنِّي وَلاَ قُوَّةٍ",
+        transliteration: "Alhamdulillahil-ladhi kasani hadha wa razaqanihi min ghayri hawlin minni wa la quwwah",
+        meaning: {
+          en: "All praise is for Allah who has clothed me with this and provided it for me.",
+          bn: "সমস্ত প্রশংসা আল্লাহর জন্য যিনি আমাকে এই কাপড় পরিয়েছেন।"
+        },
+        audioUrl: "https://archive.org/download/islamic-dua-in-audio/dua-after-wearing-clothes.ogg",
       },
     ],
   },
@@ -111,6 +136,7 @@ const duaCategories: DuaCategory[] = [
           en: "O Allah, I seek refuge in You from anxiety, sorrow, weakness, and laziness.",
           bn: "হে আল্লাহ, আমি আপনার কাছে দুশ্চিন্তা, দুঃখ, দুর্বলতা ও অলসতা থেকে আশ্রয় চাই।"
         },
+        audioUrl: "https://archive.org/download/islamic-dua-in-audio/dua-for-trouble.ogg",
       },
       {
         id: "6",
@@ -122,6 +148,7 @@ const duaCategories: DuaCategory[] = [
           en: "There is no god but Allah, the Mighty, the Forbearing. There is no god but Allah, Lord of the Magnificent Throne.",
           bn: "আল্লাহ ছাড়া কোন ইলাহ নেই, যিনি মহান ও সহনশীল। আল্লাহ ছাড়া কোন ইলাহ নেই, মহান আরশের রব।"
         },
+        audioUrl: "https://archive.org/download/islamic-dua-in-audio/dua-to-get-rid-of-tiredness.ogg",
       },
       {
         id: "7",
@@ -133,6 +160,7 @@ const duaCategories: DuaCategory[] = [
           en: "O Allah, I am Your servant, son of Your servant. My forelock is in Your hand.",
           bn: "হে আল্লাহ, আমি আপনার বান্দা, আপনার বান্দার সন্তান। আমার কপাল আপনার হাতে।"
         },
+        audioUrl: "https://archive.org/download/islamic-dua-in-audio/dua-for-asking-forgiveness.ogg",
       },
     ],
   },
@@ -152,6 +180,7 @@ const duaCategories: DuaCategory[] = [
           en: "In the name of Allah and with the blessings of Allah.",
           bn: "আল্লাহর নামে এবং আল্লাহর বরকতে।"
         },
+        audioUrl: "https://archive.org/download/islamic-dua-in-audio/dua-before-eating.ogg",
       },
       {
         id: "9",
@@ -163,6 +192,19 @@ const duaCategories: DuaCategory[] = [
           en: "All praise is for Allah who has given us food and drink and made us Muslims.",
           bn: "সমস্ত প্রশংসা আল্লাহর জন্য যিনি আমাদের খাদ্য ও পানীয় দিয়েছেন এবং আমাদের মুসলিম বানিয়েছেন।"
         },
+        audioUrl: "https://archive.org/download/islamic-dua-in-audio/dua-after-eating.ogg",
+      },
+      {
+        id: "12",
+        titleKey: "drinkingWaterDua",
+        title: { en: "Dua After Drinking Water", bn: "পানি পানের পর দোয়া" },
+        arabic: "الْحَمْدُ لِلَّهِ الَّذِي سَقَانَا عَذْبًا فُرَاتًا بِرَحْمَتِهِ",
+        transliteration: "Alhamdulillahil-ladhi saqana 'adhban furatan bi-rahmatihi",
+        meaning: {
+          en: "All praise is for Allah who gave us sweet water to drink by His mercy.",
+          bn: "সমস্ত প্রশংসা আল্লাহর জন্য যিনি তাঁর রহমতে আমাদের মিষ্টি পানি পান করিয়েছেন।"
+        },
+        audioUrl: "https://archive.org/download/islamic-dua-in-audio/dua-after-drinking-water.ogg",
       },
     ],
   },
