@@ -328,24 +328,34 @@ interface DuaItemProps {
 function DuaItem({ dua, iconColor, delay, language }: DuaItemProps) {
   const { theme } = useTheme();
   const [playing, setPlaying] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
 
   const getText = (textItem: { en: string; bn: string }) => language === "bn" ? textItem.bn : textItem.en;
 
+  function encodeBase64Url(text: string): string {
+    const base64 = btoa(unescape(encodeURIComponent(text)));
+    return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
+
   async function playSound() {
-    if (!dua.audioUrl) {
-      return;
-    }
-    
     try {
       if (sound) {
         await sound.unloadAsync();
       }
       
-      setPlaying(true);
+      setLoading(true);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      
+      const apiUrl = process.env.EXPO_PUBLIC_DOMAIN || "";
+      const hash = encodeBase64Url(dua.arabic);
+      const audioUri = `${apiUrl}/api/tts/${hash}`;
+      
+      setPlaying(true);
+      setLoading(false);
+      
       const { sound: newSound } = await Audio.Sound.createAsync(
-        { uri: dua.audioUrl },
+        { uri: audioUri },
         { shouldPlay: true }
       );
       setSound(newSound);
@@ -357,6 +367,7 @@ function DuaItem({ dua, iconColor, delay, language }: DuaItemProps) {
       });
     } catch (error) {
       console.error("Error playing sound", error);
+      setLoading(false);
       setPlaying(false);
     }
   }
@@ -368,15 +379,13 @@ function DuaItem({ dua, iconColor, delay, language }: DuaItemProps) {
         <ThemedText type="body" style={{ flex: 1, fontFamily: "Nunito_600SemiBold" }}>
           {getText(dua.title)}
         </ThemedText>
-        {dua.audioUrl && (
-          <Pressable onPress={playSound} style={[styles.audioButton, { backgroundColor: iconColor + "20" }]}>
-            {playing ? (
-              <ActivityIndicator size="small" color={iconColor} />
-            ) : (
-              <Feather name="play" size={14} color={iconColor} />
-            )}
-          </Pressable>
-        )}
+        <Pressable onPress={playSound} style={[styles.audioButton, { backgroundColor: iconColor + "20" }]} disabled={loading || playing}>
+          {loading || playing ? (
+            <ActivityIndicator size="small" color={iconColor} />
+          ) : (
+            <Feather name="play" size={14} color={iconColor} />
+          )}
+        </Pressable>
       </View>
       <View style={styles.duaContent}>
         <ThemedText style={styles.arabicText}>{dua.arabic}</ThemedText>
