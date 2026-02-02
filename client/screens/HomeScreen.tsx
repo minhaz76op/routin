@@ -154,11 +154,13 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 function getGreeting(language: "en" | "bn"): string {
   const hour = new Date().getHours();
-  if (hour >= 5 && hour < 12) {
+  if (hour >= 6 && hour < 11) {
     return language === "bn" ? "সুপ্রভাত, জুহি!" : "Good Morning, Juhi!";
-  } else if (hour >= 12 && hour < 17) {
-    return language === "bn" ? "শুভ দুপুর, জুহি!" : "Good Afternoon, Juhi!";
-  } else if (hour >= 17 && hour < 21) {
+  } else if (hour >= 11 && hour < 15) {
+    return language === "bn" ? "শুভ দুপুর, জুহি!" : "Good Noon, Juhi!";
+  } else if (hour >= 15 && hour < 18) {
+    return language === "bn" ? "শুভ বিকাল, জুহি!" : "Good Afternoon, Juhi!";
+  } else if (hour >= 18 && hour < 21) {
     return language === "bn" ? "শুভ সন্ধ্যা, জুহি!" : "Good Evening, Juhi!";
   } else {
     return language === "bn" ? "শুভ রাত্রি, জুহি!" : "Good Night, Juhi!";
@@ -167,9 +169,10 @@ function getGreeting(language: "en" | "bn"): string {
 
 function getGreetingIcon(): keyof typeof Feather.glyphMap {
   const hour = new Date().getHours();
-  if (hour >= 5 && hour < 12) return "sunrise";
-  if (hour >= 12 && hour < 17) return "sun";
-  if (hour >= 17 && hour < 21) return "sunset";
+  if (hour >= 6 && hour < 11) return "sunrise";
+  if (hour >= 11 && hour < 15) return "sun";
+  if (hour >= 15 && hour < 18) return "cloud";
+  if (hour >= 18 && hour < 21) return "sunset";
   return "moon";
 }
 
