@@ -374,36 +374,35 @@ function DuaItem({ dua, iconColor, delay, language }: DuaItemProps) {
 
   return (
     <Animated.View entering={FadeInUp.delay(delay)} style={[styles.duaItem, { backgroundColor: theme.backgroundSecondary }]}>
-      <View style={styles.duaImageContainer}>
-        <LinearGradient
-          colors={["transparent", "rgba(0,0,0,0.8)"]}
-          style={styles.duaImageGradient}
-        />
-        <View style={[styles.duaIconBadge, { backgroundColor: iconColor + "40" }]}>
-          <Feather name="activity" size={20} color="#fff" />
+      <Pressable 
+        onPress={playSound}
+        style={({ pressed }) => [{ opacity: pressed ? 0.9 : 1, flex: 1 }]}
+      >
+        <View style={styles.duaImageContainer}>
+          <LinearGradient
+            colors={["transparent", "rgba(0,0,0,0.8)"]}
+            style={styles.duaImageGradient}
+          />
+          <View style={[styles.duaIconBadge, { backgroundColor: iconColor + "40" }]}>
+            <Feather name="activity" size={20} color="#fff" />
+          </View>
         </View>
-      </View>
-      
-      <View style={styles.duaFooter}>
-        <ThemedText type="h4" style={styles.duaTitle}>
-          {getText(dua.title)}
-        </ThemedText>
-        <ThemedText style={[styles.duaSubtitle, { color: theme.textSecondary }]}>
-          View your daily {getText(dua.title).toLowerCase()} routine
-        </ThemedText>
-
-        <Pressable 
-          onPress={playSound} 
-          style={({ pressed }) => [
-            styles.viewDetailsButton, 
-            { backgroundColor: iconColor + "20", opacity: pressed ? 0.7 : 1 }
-          ]}
-        >
-          <ThemedText style={[styles.viewDetailsText, { color: iconColor }]}>
-            View Details →
+        
+        <View style={styles.duaFooter}>
+          <ThemedText type="h4" style={styles.duaTitle}>
+            {getText(dua.title)}
           </ThemedText>
-        </Pressable>
-      </View>
+          <ThemedText style={[styles.duaSubtitle, { color: theme.textSecondary }]}>
+            View your daily {getText(dua.title).toLowerCase()} routine
+          </ThemedText>
+
+          <View style={[styles.viewDetailsButton, { backgroundColor: iconColor + "20" }]}>
+            <ThemedText style={[styles.viewDetailsText, { color: iconColor }]}>
+              {loading ? "Loading..." : playing ? "Playing..." : "View Details →"}
+            </ThemedText>
+          </View>
+        </View>
+      </Pressable>
     </Animated.View>
   );
 }
