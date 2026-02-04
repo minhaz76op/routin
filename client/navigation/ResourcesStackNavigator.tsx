@@ -6,6 +6,7 @@ import FoodChartScreen from "@/screens/FoodChartScreen";
 import ExerciseScreen from "@/screens/ExerciseScreen";
 import DuasScreen from "@/screens/DuasScreen";
 import RemindersScreen from "@/screens/RemindersScreen";
+import PrescriptionScreen from "@/screens/PrescriptionScreen";
 import { useScreenOptions } from "@/hooks/useScreenOptions";
 import { useApp } from "@/context/AppContext";
 
@@ -15,6 +16,7 @@ export type ResourcesStackParamList = {
   Exercise: undefined;
   Duas: undefined;
   Reminders: undefined;
+  Prescription: undefined;
 };
 
 const Stack = createNativeStackNavigator<ResourcesStackParamList>();
@@ -58,6 +60,13 @@ export default function ResourcesStackNavigator() {
         component={RemindersScreen}
         options={{
           headerTitle: t("reminders"),
+        }}
+      />
+      <Stack.Screen
+        name="Prescription"
+        component={PrescriptionScreen}
+        options={{
+          headerTitle: language === "bn" ? "প্রেসক্রিপশন" : "Prescription",
         }}
       />
     </Stack.Navigator>

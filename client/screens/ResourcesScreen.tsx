@@ -261,6 +261,19 @@ export default function ResourcesScreen() {
       />
       <View style={{ height: Spacing.md }} />
 
+      <ResourceCard
+        title={language === "bn" ? "প্রেসক্রিপশন" : "Prescription"}
+        description={language === "bn" ? "আপনার প্রেসক্রিপশন দেখুন" : "View your prescription"}
+        icon="file-text"
+        gradientColors={[Colors.light.primary + "10", "transparent"]}
+        iconColor={Colors.light.primary}
+        onPress={() => navigation.navigate("Prescription")}
+        index={3}
+        viewDetailsText={viewDetailsText}
+        compact
+      />
+      <View style={{ height: Spacing.md }} />
+
     </ScrollView>
   );
 }
