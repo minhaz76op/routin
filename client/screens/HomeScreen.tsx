@@ -5,6 +5,7 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import { useNavigation } from "@react-navigation/native";
 import Animated, {
   FadeInDown,
   FadeInUp,
@@ -504,11 +505,64 @@ function RoutineCard({ item, index }: { item: RoutineItem; index: number }) {
   );
 }
 
+function ResourceCard({ item }: { item: { id: string; title: string; subtitle: string; icon: keyof typeof Feather.glyphMap; color: string; screen: string } }) {
+  const { theme } = useTheme();
+  const navigation = useNavigation<any>();
+
+  return (
+    <Animated.View entering={FadeInUp.delay(800).springify()}>
+      <Pressable
+        onPress={() => navigation.navigate("Resources", { screen: item.screen })}
+        style={({ pressed }) => [
+          styles.resourceCard,
+          {
+            backgroundColor: theme.backgroundSecondary,
+            opacity: pressed ? 0.9 : 1,
+          },
+        ]}
+      >
+        <View style={[styles.resourceIconContainer, { backgroundColor: item.color + "20" }]}>
+          <Feather name={item.icon} size={20} color={item.color} />
+        </View>
+        <View style={styles.resourceContent}>
+          <ThemedText type="h4" style={{ fontFamily: "Nunito_600SemiBold" }}>
+            {item.title}
+          </ThemedText>
+          <ThemedText type="small" style={{ color: theme.textSecondary, fontFamily: "Nunito_400Regular" }}>
+            {item.subtitle}
+          </ThemedText>
+        </View>
+        <Feather name="chevron-right" size={20} color={theme.textSecondary} />
+      </Pressable>
+    </Animated.View>
+  );
+}
+
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const tabBarHeight = useBottomTabBarHeight();
   const { theme } = useTheme();
+  const { language } = useApp();
+
+  const resourceCards = [
+    {
+      id: "duas",
+      title: language === "bn" ? "দোয়া" : "Duas",
+      subtitle: language === "bn" ? "প্রতিদিনের দোয়া এবং প্রার্থনা দেখুন" : "View daily duas and prayers",
+      icon: "book" as const,
+      color: "#7C7CD9",
+      screen: "Duas",
+    },
+    {
+      id: "prescription",
+      title: language === "bn" ? "প্রেসক্রিপশন" : "Prescription",
+      subtitle: language === "bn" ? "আপনার প্রেসক্রিপশন দেখুন" : "View your prescription",
+      icon: "file-text" as const,
+      color: "#E8A5A5",
+      screen: "Prescription",
+    },
+  ];
 
   return (
     <FlatList
@@ -521,7 +575,19 @@ export default function HomeScreen() {
       scrollIndicatorInsets={{ bottom: insets.bottom }}
       data={routineData}
       keyExtractor={(item) => item.id}
-      ListHeaderComponent={<WelcomeHeader />}
+      ListHeaderComponent={
+        <>
+          <WelcomeHeader />
+          <View style={{ marginBottom: Spacing.xl }}>
+            {resourceCards.map((card) => (
+              <ResourceCard key={card.id} item={card} />
+            ))}
+          </View>
+          <ThemedText type="h3" style={{ marginBottom: Spacing.md, fontFamily: "Nunito_700Bold" }}>
+            {language === "bn" ? "আজকের রুটিন" : "Today's Routine"}
+          </ThemedText>
+        </>
+      }
       renderItem={({ item, index }) => <RoutineCard item={item} index={index} />}
       ItemSeparatorComponent={() => <View style={{ height: Spacing.md }} />}
       showsVerticalScrollIndicator={false}
@@ -725,5 +791,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: Spacing.md,
     gap: Spacing.xs,
+  },
+  resourceCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
+    marginBottom: Spacing.md,
+  },
+  resourceIconContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: Spacing.md,
+  },
+  resourceContent: {
+    flex: 1,
   },
 });
