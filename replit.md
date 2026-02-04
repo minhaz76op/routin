@@ -6,6 +6,11 @@ A personal wellness companion mobile app designed specifically for Juhi, a 21-22
 
 The app features a warm, nurturing aesthetic with soft colors, gentle curves, and approachable typography - designed to feel like a caring friend rather than a clinical health app.
 
+## Recent Changes
+
+- [2026-02-04] Migrated DuasScreen design to match user-provided card layout with image placeholder, badge, and "View Details" button.
+- [2026-02-04] Reinstalled OpenAI integration to fix missing environment variables.
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.

@@ -373,31 +373,36 @@ function DuaItem({ dua, iconColor, delay, language }: DuaItemProps) {
   }
 
   return (
-    <Animated.View entering={FadeInUp.delay(delay)} style={styles.duaItem}>
-      <View style={styles.duaHeader}>
-        <View style={[styles.bullet, { backgroundColor: iconColor }]} />
-        <ThemedText type="body" style={{ flex: 1, fontFamily: "Nunito_600SemiBold" }}>
+    <Animated.View entering={FadeInUp.delay(delay)} style={[styles.duaItem, { backgroundColor: theme.backgroundSecondary }]}>
+      <View style={styles.duaImageContainer}>
+        <LinearGradient
+          colors={["transparent", "rgba(0,0,0,0.8)"]}
+          style={styles.duaImageGradient}
+        />
+        <View style={[styles.duaIconBadge, { backgroundColor: iconColor + "40" }]}>
+          <Feather name="activity" size={20} color="#fff" />
+        </View>
+      </View>
+      
+      <View style={styles.duaFooter}>
+        <ThemedText type="h4" style={styles.duaTitle}>
           {getText(dua.title)}
         </ThemedText>
-        <Pressable onPress={playSound} style={[styles.audioButton, { backgroundColor: iconColor + "20" }]} disabled={loading || playing}>
-          {loading || playing ? (
-            <ActivityIndicator size="small" color={iconColor} />
-          ) : (
-            <Feather name="play" size={14} color={iconColor} />
-          )}
-        </Pressable>
-      </View>
-      <View style={styles.duaContent}>
-        <ThemedText style={styles.arabicText}>{dua.arabic}</ThemedText>
-        <ThemedText style={[styles.transliteration, { color: theme.textSecondary }]}>
-          {dua.transliteration}
+        <ThemedText style={[styles.duaSubtitle, { color: theme.textSecondary }]}>
+          View your daily {getText(dua.title).toLowerCase()} routine
         </ThemedText>
-        <View style={[styles.meaningContainer, { backgroundColor: iconColor + "08" }]}>
-          <Feather name="info" size={12} color={iconColor} style={{ marginTop: 2, marginRight: 6 }} />
-          <ThemedText type="small" style={{ flex: 1, color: theme.text, fontFamily: "Nunito_400Regular" }}>
-            {getText(dua.meaning)}
+
+        <Pressable 
+          onPress={playSound} 
+          style={({ pressed }) => [
+            styles.viewDetailsButton, 
+            { backgroundColor: iconColor + "20", opacity: pressed ? 0.7 : 1 }
+          ]}
+        >
+          <ThemedText style={[styles.viewDetailsText, { color: iconColor }]}>
+            View Details →
           </ThemedText>
-        </View>
+        </Pressable>
       </View>
     </Animated.View>
   );
@@ -415,32 +420,21 @@ function DuaSection({ category, delay, language }: DuaSectionProps) {
 
   return (
     <Animated.View entering={FadeInUp.delay(delay).springify()}>
-      <View style={[styles.section, { backgroundColor: theme.backgroundDefault, borderColor: theme.border }]}>
-        <LinearGradient
-          colors={[category.iconColor + "08", "transparent"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={StyleSheet.absoluteFill}
-        />
-        <View style={styles.sectionHeader}>
-          <View style={[styles.iconContainer, { backgroundColor: category.iconColor + "20" }]}>
-            <Feather name={category.icon} size={22} color={category.iconColor} />
-          </View>
-          <ThemedText type="h4" style={{ fontFamily: "Nunito_600SemiBold", flex: 1 }}>
-            {getText(category.title)}
-          </ThemedText>
-        </View>
-        <View style={styles.duasList}>
-          {category.duas.map((dua, index) => (
-            <DuaItem
-              key={dua.id}
-              dua={dua}
-              iconColor={category.iconColor}
-              delay={delay + index * 50}
-              language={language}
-            />
-          ))}
-        </View>
+      <View style={styles.sectionHeader}>
+        <ThemedText type="h3" style={{ fontFamily: "Nunito_700Bold" }}>
+          {getText(category.title)}
+        </ThemedText>
+      </View>
+      <View style={styles.duasList}>
+        {category.duas.map((dua, index) => (
+          <DuaItem
+            key={dua.id}
+            dua={dua}
+            iconColor={category.iconColor}
+            delay={delay + index * 50}
+            language={language}
+          />
+        ))}
       </View>
     </Animated.View>
   );
@@ -502,6 +496,61 @@ export default function DuasScreen() {
 }
 
 const styles = StyleSheet.create({
+  duaItem: {
+    borderRadius: 24,
+    marginBottom: Spacing.lg,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.05)",
+  },
+  duaImageContainer: {
+    height: 180,
+    backgroundColor: "#e0d5c1", // Placeholder like the image background
+    position: "relative",
+  },
+  duaImageGradient: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 100,
+  },
+  duaIconBadge: {
+    position: "absolute",
+    bottom: 16,
+    left: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 10,
+  },
+  duaFooter: {
+    padding: 20,
+    backgroundColor: "#1a1a1a",
+  },
+  duaTitle: {
+    color: "#fff",
+    fontFamily: "Nunito_700Bold",
+    fontSize: 20,
+    marginBottom: 4,
+  },
+  duaSubtitle: {
+    fontSize: 14,
+    fontFamily: "Nunito_400Regular",
+    marginBottom: 20,
+  },
+  viewDetailsButton: {
+    alignSelf: "flex-start",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+  },
+  viewDetailsText: {
+    fontSize: 14,
+    fontFamily: "Nunito_600SemiBold",
+  },
   headerSection: {
     marginBottom: Spacing.xl,
   },
@@ -531,70 +580,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  section: {
-    borderRadius: BorderRadius.lg,
-    padding: Spacing.lg,
-    borderWidth: 1,
-    overflow: "hidden",
-  },
   sectionHeader: {
-    flexDirection: "row",
-    alignItems: "center",
+    marginTop: Spacing.xl,
     marginBottom: Spacing.md,
   },
-  iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: BorderRadius.sm,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: Spacing.md,
-  },
   duasList: {
-    gap: Spacing.lg,
-  },
-  duaItem: {
-    paddingTop: Spacing.sm,
-  },
-  duaHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: Spacing.sm,
-  },
-  bullet: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginRight: Spacing.sm,
-  },
-  audioButton: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    alignItems: "center",
-    justifyContent: "center",
-    marginLeft: Spacing.sm,
-  },
-  duaContent: {
-    marginLeft: Spacing.md + 8,
-  },
-  arabicText: {
-    fontSize: 18,
-    textAlign: "right",
-    lineHeight: 32,
-    marginBottom: Spacing.sm,
-    fontFamily: "Nunito_700Bold",
-  },
-  transliteration: {
-    fontStyle: "italic",
-    fontSize: 13,
-    marginBottom: Spacing.sm,
-    fontFamily: "Nunito_400Regular",
-  },
-  meaningContainer: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    padding: Spacing.sm,
-    borderRadius: BorderRadius.sm,
+    gap: Spacing.md,
   },
 });
