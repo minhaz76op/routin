@@ -25,7 +25,10 @@ router.post("/api/tts", async (req: Request, res: Response) => {
 
 router.get("/api/tts/:hash", async (req: Request, res: Response) => {
   try {
-    const { hash } = req.params;
+    const hash = req.params.hash;
+    if (typeof hash !== "string") {
+      return res.status(400).json({ error: "Invalid hash" });
+    }
     const text = Buffer.from(hash, "base64url").toString("utf-8");
     
     if (!text) {

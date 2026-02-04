@@ -349,7 +349,7 @@ function DuaItem({ dua, iconColor, delay, language }: DuaItemProps) {
       setLoading(true);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       
-      const apiUrl = process.env.EXPO_PUBLIC_DOMAIN || "";
+      const apiUrl = process.env.EXPO_PUBLIC_DOMAIN ? `https://${process.env.EXPO_PUBLIC_DOMAIN}` : "";
       const hash = encodeBase64Url(dua.arabic);
       const audioUri = `${apiUrl}/api/tts/${hash}`;
       
