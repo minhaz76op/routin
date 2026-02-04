@@ -334,7 +334,9 @@ function DuaItem({ dua, iconColor, delay, language }: DuaItemProps) {
   const getText = (textItem: { en: string; bn: string }) => language === "bn" ? textItem.bn : textItem.en;
 
   function encodeBase64Url(text: string): string {
-    const base64 = btoa(unescape(encodeURIComponent(text)));
+    const bytes = new TextEncoder().encode(text);
+    const binString = Array.from(bytes, (byte) => String.fromCharCode(byte)).join("");
+    const base64 = btoa(binString);
     return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
   }
 
