@@ -49,10 +49,16 @@ export class DatabaseStorage implements IStorage {
     await db.insert(checkins).values({ routineId });
   }
 
-  async getCheckInData(): Promise<{ daily: number, weekly: number, monthly: number, breakdown: Record<string, number> }> {
+  async getCheckInData(): Promise<{ 
+    daily: number, 
+    weekly: number, 
+    monthly: number, 
+    breakdown: Record<string, number>,
+    weeklyHistory: { date: string, percentage: number }[]
+  }> {
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
+    const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6);
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30);
 
     const [dailyRes] = await db.select({ count: sql<number>`count(DISTINCT routine_id)` })
@@ -78,6 +84,20 @@ export class DatabaseStorage implements IStorage {
     const weeklySum = weeklyData.reduce((acc, curr) => acc + Number(curr.count), 0);
     const monthlySum = monthlyData.reduce((acc, curr) => acc + Number(curr.count), 0);
 
+    // Generate last 7 days history
+    const weeklyHistory: { date: string, percentage: number }[] = [];
+    const totalRoutines = 7; // Matching routineData.length from HomeScreen
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      const dayData = weeklyData.find(w => w.day === dateStr);
+      const count = dayData ? Number(dayData.count) : 0;
+      weeklyHistory.push({
+        date: dateStr,
+        percentage: Math.round((count / totalRoutines) * 100)
+      });
+    }
+
     const breakdownRes = await db.select({ 
       routineId: checkins.routineId, 
       count: sql<number>`count(*)` 
@@ -94,7 +114,8 @@ export class DatabaseStorage implements IStorage {
       daily: Number(dailyRes.count), 
       weekly: weeklySum, 
       monthly: monthlySum, 
-      breakdown 
+      breakdown,
+      weeklyHistory
     };
   }
 }

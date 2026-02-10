@@ -281,6 +281,29 @@ function WelcomeHeader() {
             {t("stayHealthy")}
           </ThemedText>
           
+          <View style={styles.weeklyHistoryContainer}>
+            <ThemedText type="small" style={{ fontFamily: "Nunito_700Bold", marginBottom: 8, color: Colors.light.primary }}>
+              {language === "bn" ? "গত ৭ দিনের অগ্রগতি" : "Completed task (Last 7 Days)"}
+            </ThemedText>
+            <View style={styles.weeklyHistoryRow}>
+              {stats.weeklyHistory.map((day: { date: string, percentage: number }, idx: number) => {
+                const dateObj = new Date(day.date);
+                const dayLabel = dateObj.toLocaleDateString(language === "bn" ? "bn-BD" : "en-US", { weekday: 'short' });
+                const dateLabel = dateObj.getDate();
+                return (
+                  <View key={idx} style={styles.historyItem}>
+                    <View style={styles.historyBarContainer}>
+                      <View style={[styles.historyBarFill, { height: `${day.percentage}%` }]} />
+                    </View>
+                    <ThemedText style={styles.historyPercentage}>{day.percentage}%</ThemedText>
+                    <ThemedText style={styles.historyDate}>{dateLabel}</ThemedText>
+                    <ThemedText style={styles.historyDay}>{dayLabel}</ThemedText>
+                  </View>
+                );
+              })}
+            </View>
+          </View>
+          
           <View style={styles.progressContainer}>
             <View style={styles.progressBar}>
               <View 
@@ -676,6 +699,52 @@ const styles = StyleSheet.create({
   breakdownCount: {
     fontFamily: "Nunito_700Bold",
     fontSize: 12,
+  },
+  weeklyHistoryContainer: {
+    marginTop: Spacing.md,
+    padding: Spacing.md,
+    backgroundColor: "rgba(232, 165, 165, 0.1)",
+    borderRadius: BorderRadius.lg,
+  },
+  weeklyHistoryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    height: 100,
+    paddingTop: 10,
+  },
+  historyItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  historyBarContainer: {
+    width: 8,
+    height: 50,
+    backgroundColor: "rgba(0,0,0,0.05)",
+    borderRadius: 4,
+    justifyContent: 'flex-end',
+    overflow: 'hidden',
+  },
+  historyBarFill: {
+    width: '100%',
+    backgroundColor: Colors.light.primary,
+    borderRadius: 4,
+  },
+  historyPercentage: {
+    fontSize: 8,
+    fontFamily: "Nunito_700Bold",
+    color: Colors.light.primary,
+    marginTop: 4,
+  },
+  historyDate: {
+    fontSize: 9,
+    fontFamily: "Nunito_600SemiBold",
+    marginTop: 2,
+  },
+  historyDay: {
+    fontSize: 8,
+    fontFamily: "Nunito_400Regular",
+    color: "rgba(0,0,0,0.5)",
   },
   breakdownLabel: {
     fontSize: 8,
