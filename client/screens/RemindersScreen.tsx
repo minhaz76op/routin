@@ -225,7 +225,13 @@ function ReminderCategory({ category, index }: ReminderCategoryProps) {
               ]}
             >
               <Pressable 
-                onPress={() => openTimePicker(reminder.id)}
+                onPress={() => {
+                  if (!reminder.enabled) {
+                    handleToggle(reminder.id);
+                  } else {
+                    openTimePicker(reminder.id);
+                  }
+                }}
                 style={styles.reminderInfoPressable}
               >
                 <View style={[styles.reminderIcon, { backgroundColor: reminderColors[reminder.id] + "20" }]}>
