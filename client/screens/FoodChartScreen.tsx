@@ -153,6 +153,41 @@ export default function FoodChartScreen() {
         "Noodles and processed foods",
       ];
 
+  const earlyMorningTitle = language === "bn" ? "ভোরবেলা (সকাল ৬:০০ - ৭:০০)" : "Early Morning (6:00 AM - 7:00 AM)";
+  const earlyMorningItems = language === "bn"
+    ? ["১ গ্লাস কুসুম গরম পানি", "১ চা চামচ ভেজানো মেথি বীজ (ঐচ্ছিক)"]
+    : ["1 glass of lukewarm water", "1 teaspoon soaked fenugreek seeds (optional)"];
+
+  const breakfastTitle = language === "bn" ? "সকালের নাস্তা (সকাল ৮:০০ - ৯:০০)" : "Breakfast (8:00 AM - 9:00 AM)";
+  const breakfastItems = language === "bn"
+    ? ["২টি সিদ্ধ ডিম + ১টি গমের রুটি + সবজি/সালাদ", "ওটস + দুধ + বাদাম + চিয়া বীজ", "সবজি অমলেট (২টি ডিম) + ১টি গমের রুটি"]
+    : ["2 boiled eggs + 1 whole wheat flatbread + vegetables/salad", "Oats + milk + nuts + chia seeds", "Vegetable omelette (2 eggs) + 1 whole wheat flatbread"];
+
+  const midMorningTitle = language === "bn" ? "মধ্য-সকালের নাস্তা (সকাল ১১:০০)" : "Mid-Morning Snack (11:00 AM)";
+  const midMorningItems = language === "bn"
+    ? ["১টি ফল (আপেল/পেয়ারা/কমলা)", "৮-১০টি কাঠবাদাম বা এক মুঠো চিনা বাদাম"]
+    : ["1 fruit (apple/guava/orange)", "8-10 almonds or a handful of peanuts"];
+
+  const lunchTitle = language === "bn" ? "দুপুরের খাবার (দুপুর ১:০০ - ২:০০)" : "Lunch (1:00 PM - 2:00 PM)";
+  const lunchItems = language === "bn"
+    ? ["অর্ধেক প্লেট সবজি", "এক চতুর্থাংশ প্রোটিন (মাছ/মুরগি/ডাল)", "এক চতুর্থাংশ ভাত (অল্প পরিমাণে)", "তাজা সালাদ"]
+    : ["Half plate vegetables", "One quarter protein (fish/chicken/lentils)", "One quarter rice (small portion)", "Fresh salad"];
+
+  const eveningTitle = language === "bn" ? "বিকেলের নাস্তা (বিকাল ৫:০০ - ৫:৩০)" : "Evening Snack (5:00 PM - 5:30 PM)";
+  const eveningItems = language === "bn"
+    ? ["গ্রিন টি বা লেবু পানি (চিনি ছাড়া)", "ভাজা ছোলা বা সিদ্ধ মুগ ডাল বা সিদ্ধ ডিম"]
+    : ["Green tea or lemon water (no sugar)", "Roasted chickpeas or boiled mung beans or boiled egg"];
+
+  const dinnerTitle = language === "bn" ? "রাতের খাবার (রাত ৭:৩০ - ৮:০০)" : "Dinner (7:30 PM - 8:00 PM)";
+  const dinnerItems = language === "bn"
+    ? ["সবজি + ডাল অথবা মাছ + সবজি", "১টি গমের রুটি (রাতে ভাত এড়িয়ে চলুন)"]
+    : ["Vegetables + lentils OR fish + vegetables", "1 whole wheat flatbread (avoid rice at night)"];
+
+  const beforeBedTitle = language === "bn" ? "ঘুমানোর আগে (রাত ১০:০০)" : "Before Bed (10:00 PM)";
+  const beforeBedItems = language === "bn"
+    ? ["১ গ্লাস গরম দুধ", "১টি খেজুর + ২টি বাদাম"]
+    : ["1 glass warm milk", "1 date + 2 almonds"];
+
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: theme.backgroundRoot }}
@@ -184,12 +219,28 @@ export default function FoodChartScreen() {
         </LinearGradient>
       </Animated.View>
 
+      <FoodSection title={earlyMorningTitle} items={earlyMorningItems} icon="sunrise" iconColor="#FFB347" delay={150} />
+      <View style={{ height: Spacing.md }} />
+      <FoodSection title={breakfastTitle} items={breakfastItems} icon="coffee" iconColor="#E8A5A5" delay={250} />
+      <View style={{ height: Spacing.md }} />
+      <FoodSection title={midMorningTitle} items={midMorningItems} icon="sun" iconColor="#F4D03F" delay={350} />
+      <View style={{ height: Spacing.md }} />
+      <FoodSection title={lunchTitle} items={lunchItems} icon="disc" iconColor="#A8D5A8" delay={450} />
+      <View style={{ height: Spacing.md }} />
+      <FoodSection title={eveningTitle} items={eveningItems} icon="cloud" iconColor="#85C1E9" delay={550} />
+      <View style={{ height: Spacing.md }} />
+      <FoodSection title={dinnerTitle} items={dinnerItems} icon="moon" iconColor="#7C7CD9" delay={650} />
+      <View style={{ height: Spacing.md }} />
+      <FoodSection title={beforeBedTitle} items={beforeBedItems} icon="star" iconColor="#9B59B6" delay={750} />
+
+      <View style={{ height: Spacing.xl }} />
+
       <FoodSection
         title={plateMethodTitle}
         items={plateMethodItems}
         icon="pie-chart"
         iconColor={Colors.light.secondary}
-        delay={200}
+        delay={850}
       />
 
       <View style={{ height: Spacing.md }} />
@@ -199,7 +250,7 @@ export default function FoodChartScreen() {
         items={recommendedFoods}
         icon="check-circle"
         iconColor="#7CB87C"
-        delay={350}
+        delay={950}
       />
 
       <View style={{ height: Spacing.md }} />
@@ -209,7 +260,7 @@ export default function FoodChartScreen() {
         items={foodsToAvoid}
         icon="x-circle"
         iconColor={Colors.light.primary}
-        delay={500}
+        delay={1050}
       />
     </ScrollView>
   );
