@@ -318,7 +318,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
     loadSettings();
     checkNotificationPermission();
     fetchStats();
+    setupNotificationChannel();
   }, []);
+
+  const setupNotificationChannel = async () => {
+    if (Platform.OS === 'android') {
+      await Notifications.setNotificationChannelAsync('alarm', {
+        name: 'Alarms',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+        lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+        bypassDnd: true,
+      });
+    }
+  };
 
   const getTodayKey = () => {
     // Bangladesh is UTC+6
