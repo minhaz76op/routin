@@ -18,6 +18,7 @@ interface Dua {
   titleKey: string;
   title: { en: string; bn: string };
   arabic: string;
+  verses?: string;
   transliteration: string;
   meaning: { en: string; bn: string };
   audioUrl?: string;
@@ -43,6 +44,7 @@ const duaCategories: DuaCategory[] = [
         titleKey: "ayatulKursi",
         title: { en: "Ayatul Kursi", bn: "আয়াতুল কুরসি" },
         arabic: "اللَّهُ لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ مَنْ ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلَّا بِإِذْنِهِ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ وَلَا يُحِيطُونَ بِشَيْءٍ مِنْ عِلْمِهِ إِلَّا بِمَا شَاءَ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ وَلَا يَئُودُهُ حِفْظُهُمَا وَهُوَ الْعَلِيُّ الْعَظِيمُ",
+        verses: "2:255",
         transliteration: "Allahu la ilaha illa Huwa, Al-Hayyul-Qayyum. La ta'khudhuhu sinatun wa la nawm. Lahu ma fis-samawati wa ma fil-ard. Man dhal-ladhi yashfa'u 'indahu illa bi-idhnihi? Ya'lamu ma bayna aydihim wa ma khalfahum. Wa la yuhituna bi-shay'im-min 'ilmihi illa bi-ma sha'. Wasi'a kursiyyuhus-samawati wal-ard. Wa la ya'uduhu hifdhuhuma wa Huwal-'Aliyyul-'Adhim.",
         meaning: {
           en: "Allah! There is no god but He, the Living, the Self-subsisting, Eternal. No slumber can seize Him nor sleep. His are all things in the heavens and on earth.",
@@ -55,6 +57,7 @@ const duaCategories: DuaCategory[] = [
         titleKey: "surahIkhlas",
         title: { en: "Surah Al-Ikhlas", bn: "সূরা আল-ইখলাস" },
         arabic: "قُلْ هُوَ اللَّهُ أَحَدٌ اللَّهُ الصَّمَدُ لَمْ يَلِدْ وَلَمْ يُولَدْ وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ",
+        verses: "112:1-4",
         transliteration: "Qul huwallahu ahad. Allahus-samad. Lam yalid wa lam yulad. Wa lam yakun lahu kufuwan ahad.",
         meaning: {
           en: "Say, 'He is Allah, [who is] One. Allah, the Eternal Refuge. He neither begets nor is born, Nor is there to Him any equivalent.'",
@@ -74,6 +77,7 @@ const duaCategories: DuaCategory[] = [
         titleKey: "wakeUpDua",
         title: { en: "Dua After Waking Up", bn: "ঘুম থেকে উঠার পর দোয়া" },
         arabic: "الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ",
+        verses: "Al-Bukhari",
         transliteration: "Alhamdu lillahil-ladhi ahyana ba'da ma amatana wa ilayhin-nushur",
         meaning: {
           en: "All praise is for Allah who gave us life after having taken it from us.",
@@ -86,6 +90,7 @@ const duaCategories: DuaCategory[] = [
         titleKey: "morningDua",
         title: { en: "Morning Dua", bn: "সকালের দোয়া" },
         arabic: "اللَّهُمَّ بِكَ أَصْبَحْنَا وَبِكَ أَمْسَيْنَا وَبِكَ نَحْيَا وَبِكَ نَمُوتُ",
+        verses: "Abu Dawud",
         transliteration: "Allahumma bika asbahna, wa bika amsayna, wa bika nahya, wa bika namutu",
         meaning: {
           en: "O Allah, by Your leave we have reached the morning, by Your leave we live and die.",
@@ -98,6 +103,7 @@ const duaCategories: DuaCategory[] = [
         titleKey: "eveningDua",
         title: { en: "Evening Dua", bn: "সন্ধ্যার দোয়া" },
         arabic: "اللَّهُمَّ بِكَ أَمْسَيْنَا وَبِكَ أَصْبَحْنَا وَبِكَ نَحْيَا وَبِكَ نَمُوتُ",
+        verses: "Abu Dawud",
         transliteration: "Allahumma bika amsayna, wa bika asbahna, wa bika nahya, wa bika namutu",
         meaning: {
           en: "O Allah, by Your leave we have reached the evening, by Your leave we live and die.",
@@ -110,6 +116,7 @@ const duaCategories: DuaCategory[] = [
         titleKey: "sleepDua",
         title: { en: "Dua Before Sleeping", bn: "ঘুমানোর আগে দোয়া" },
         arabic: "بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا",
+        verses: "Al-Bukhari",
         transliteration: "Bismika Allahumma amutu wa ahya",
         meaning: {
           en: "In Your name, O Allah, I die and I live.",
@@ -130,6 +137,7 @@ const duaCategories: DuaCategory[] = [
         titleKey: "healthDua",
         title: { en: "Dua for Good Health", bn: "সুস্বাস্থ্যের জন্য দোয়া" },
         arabic: "اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي",
+        verses: "Abu Dawud",
         transliteration: "Allahumma 'afini fi badani, Allahumma 'afini fi sam'i, Allahumma 'afini fi basari",
         meaning: {
           en: "O Allah, grant me health in my body, hearing, and sight.",
@@ -142,6 +150,7 @@ const duaCategories: DuaCategory[] = [
         titleKey: "clothesDua",
         title: { en: "Dua After Wearing Clothes", bn: "কাপড় পরার পর দোয়া" },
         arabic: "الْحَمْدُ لِلَّهِ الَّذِي كَسَانِي هَذَا وَرَزَقَنِيهِ مِنْ غَيْرِ حَوْلٍ مِنِّي وَلاَ قُوَّةٍ",
+        verses: "Abu Dawud",
         transliteration: "Alhamdulillahil-ladhi kasani hadha wa razaqanihi min ghayri hawlin minni wa la quwwah",
         meaning: {
           en: "All praise is for Allah who has clothed me with this and provided it for me.",
@@ -162,6 +171,7 @@ const duaCategories: DuaCategory[] = [
         titleKey: "moodDua",
         title: { en: "Dua for Peace of Mind", bn: "মনের শান্তির জন্য দোয়া" },
         arabic: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ وَالْعَجْزِ وَالْكَسَلِ",
+        verses: "Al-Bukhari",
         transliteration: "Allahumma inni a'udhu bika minal-hammi wal-hazani wal-'ajzi wal-kasali",
         meaning: {
           en: "O Allah, I seek refuge in You from anxiety, sorrow, weakness, and laziness.",
@@ -174,6 +184,7 @@ const duaCategories: DuaCategory[] = [
         titleKey: "stressDua",
         title: { en: "Dua When Stressed", bn: "মানসিক চাপে দোয়া" },
         arabic: "لاَ إِلَهَ إِلاَّ اللَّهُ الْعَظِيمُ الْحَلِيمُ، لاَ إِلَهَ إِلاَّ اللَّهُ رَبُّ الْعَرْشِ الْعَظِيمِ",
+        verses: "Al-Bukhari",
         transliteration: "La ilaha illallahul-'Azimul-Halim, la ilaha illallahu Rabbul-'Arshil-'Azim",
         meaning: {
           en: "There is no god but Allah, the Mighty, the Forbearing. There is no god but Allah, Lord of the Magnificent Throne.",
@@ -186,6 +197,7 @@ const duaCategories: DuaCategory[] = [
         titleKey: "sadnessDua",
         title: { en: "Dua When Sad", bn: "দুঃখের সময় দোয়া" },
         arabic: "اللَّهُمَّ إِنِّي عَبْدُكَ، ابْنُ عَبْدِكَ، ابْنُ أَمَتِكَ، نَاصِيَتِي بِيَدِكَ",
+        verses: "Ahmad",
         transliteration: "Allahumma inni 'abduka, ibnu 'abdika, ibnu amatika, nasiyati biyadika",
         meaning: {
           en: "O Allah, I am Your servant, son of Your servant. My forelock is in Your hand.",
@@ -206,6 +218,7 @@ const duaCategories: DuaCategory[] = [
         titleKey: "eatingDua",
         title: { en: "Dua Before Eating", bn: "খাওয়ার আগে দোয়া" },
         arabic: "بِسْمِ اللهِ وَعَلَى بَرَكَةِ اللهِ",
+        verses: "Al-Hakim",
         transliteration: "Bismillahi wa 'ala barakatillah",
         meaning: {
           en: "In the name of Allah and with the blessings of Allah.",
@@ -218,6 +231,7 @@ const duaCategories: DuaCategory[] = [
         titleKey: "afterEatingDua",
         title: { en: "Dua After Eating", bn: "খাওয়ার পরে দোয়া" },
         arabic: "الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مُسْلِمِينَ",
+        verses: "Abu Dawud",
         transliteration: "Alhamdu lillahil-ladhi at'amana wa saqana wa ja'alana muslimin",
         meaning: {
           en: "All praise is for Allah who has given us food and drink and made us Muslims.",
@@ -229,7 +243,8 @@ const duaCategories: DuaCategory[] = [
         id: "12",
         titleKey: "drinkingWaterDua",
         title: { en: "Dua After Drinking Water", bn: "পানি পানের পর দোয়া" },
-        arabic: "الْحَمْدُ لِلَّهِ الَّذِي سَقَانَا عَذْبًا فُرَاتًا بِরَحْمَتِهِ",
+        arabic: "الْحَمْدُ لِلَّهِ الَّذِي سَقَانَا عَذْبًا فُرَاتًا بِرَحْمَتِهِ",
+        verses: "Tabarani",
         transliteration: "Alhamdulillahil-ladhi saqana 'adhban furatan bi-rahmatihi",
         meaning: {
           en: "All praise is for Allah who gave us sweet water to drink by His mercy.",
@@ -242,6 +257,7 @@ const duaCategories: DuaCategory[] = [
         titleKey: "milkDua",
         title: { en: "Dua After Drinking Milk", bn: "দুধ পানের পর দোয়া" },
         arabic: "اللَّهُمَّ بَارِكْ لَنَا فِيهِ وَزِدْنَا مِنْهُ",
+        verses: "At-Tirmidhi",
         transliteration: "Allahumma barik lana fihi wa zidna minhu",
         meaning: {
           en: "O Allah, bless us in it and give us more of it.",
@@ -261,6 +277,7 @@ const duaCategories: DuaCategory[] = [
         titleKey: "knowledgeDua",
         title: { en: "Dua for Knowledge", bn: "জ্ঞানের জন্য দোয়া" },
         arabic: "رَّبِّ زِدْنِي عِلْمًا",
+        verses: "20:114",
         transliteration: "Rabbi zidni 'ilma",
         meaning: {
           en: "My Lord, increase me in knowledge.",
@@ -272,6 +289,7 @@ const duaCategories: DuaCategory[] = [
         titleKey: "easeDua",
         title: { en: "Dua for Ease in Tasks", bn: "কাজে সহজতার দোয়া" },
         arabic: "رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي",
+        verses: "20:25-26",
         transliteration: "Rabbi-shrah li sadri, wa yassir li amri",
         meaning: {
           en: "My Lord, expand for me my chest [with assurance] and ease for me my task.",
@@ -391,9 +409,16 @@ function DuaItem({ dua, iconColor, delay, language }: DuaItemProps) {
         </View>
         
         <View style={styles.duaFooter}>
-          <ThemedText type="h4" style={styles.duaTitle}>
-            {getText(dua.title)}
-          </ThemedText>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <ThemedText type="h4" style={styles.duaTitle}>
+              {getText(dua.title)}
+            </ThemedText>
+            {dua.verses && (
+              <ThemedText type="small" style={{ color: theme.textSecondary, fontFamily: "Nunito_600SemiBold" }}>
+                {dua.verses}
+              </ThemedText>
+            )}
+          </View>
           <ThemedText style={[styles.duaSubtitle, { color: theme.textSecondary }]}>
             View your daily {getText(dua.title).toLowerCase()} routine
           </ThemedText>
