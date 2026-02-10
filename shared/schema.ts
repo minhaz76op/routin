@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, integer, serial } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -21,6 +21,12 @@ export const checkouts = pgTable("checkouts", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const checkins = pgTable("checkins", {
+  id: serial("id").primaryKey(),
+  routineId: text("routine_id").notNull(),
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
@@ -32,7 +38,13 @@ export const insertCheckoutSchema = createInsertSchema(checkouts).pick({
   status: true,
 });
 
+export const insertCheckinSchema = createInsertSchema(checkins).pick({
+  routineId: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertCheckout = z.infer<typeof insertCheckoutSchema>;
 export type Checkout = typeof checkouts.$inferSelect;
+export type Checkin = typeof checkins.$inferSelect;
+export type InsertCheckin = z.infer<typeof insertCheckinSchema>;
