@@ -49,23 +49,34 @@ export class DatabaseStorage implements IStorage {
     await db.insert(checkins).values({ routineId });
   }
 
-  async getCheckInData(): Promise<{daily: number, weekly: number, monthly: number, breakdown: Record<string, number>}> {
+  async getCheckInData(): Promise<{ daily: number, weekly: number, monthly: number, breakdown: Record<string, number> }> {
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30);
 
-    const [dailyRes] = await db.select({ count: sql<number>`count(*)` })
+    const [dailyRes] = await db.select({ count: sql<number>`count(DISTINCT routine_id)` })
       .from(checkins)
       .where(gte(checkins.timestamp, startOfDay));
     
-    const [weeklyRes] = await db.select({ count: sql<number>`count(*)` })
+    const weeklyData = await db.select({
+      day: sql<string>`DATE(timestamp)`,
+      count: sql<number>`count(DISTINCT routine_id)`
+    })
       .from(checkins)
-      .where(gte(checkins.timestamp, startOfWeek));
+      .where(gte(checkins.timestamp, startOfWeek))
+      .groupBy(sql`DATE(timestamp)`);
     
-    const [monthlyRes] = await db.select({ count: sql<number>`count(*)` })
+    const monthlyData = await db.select({
+      day: sql<string>`DATE(timestamp)`,
+      count: sql<number>`count(DISTINCT routine_id)`
+    })
       .from(checkins)
-      .where(gte(checkins.timestamp, startOfMonth));
+      .where(gte(checkins.timestamp, startOfMonth))
+      .groupBy(sql`DATE(timestamp)`);
+
+    const weeklySum = weeklyData.reduce((acc, curr) => acc + Number(curr.count), 0);
+    const monthlySum = monthlyData.reduce((acc, curr) => acc + Number(curr.count), 0);
 
     const breakdownRes = await db.select({ 
       routineId: checkins.routineId, 
@@ -81,8 +92,8 @@ export class DatabaseStorage implements IStorage {
 
     return { 
       daily: Number(dailyRes.count), 
-      weekly: Number(weeklyRes.count), 
-      monthly: Number(monthlyRes.count), 
+      weekly: weeklySum, 
+      monthly: monthlySum, 
       breakdown 
     };
   }
