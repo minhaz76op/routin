@@ -414,28 +414,36 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const toggleReminder = useCallback(async (id: string) => {
-    const updated = reminders.map((r) =>
-      r.id === id ? { ...r, enabled: !r.enabled } : r
-    );
-    await setReminders(updated);
-    const reminder = updated.find((r) => r.id === id);
-    if (reminder?.enabled && hasNotificationPermission) {
-      await scheduleAlarm(reminder);
-    } else {
-      await Notifications.cancelScheduledNotificationAsync(id);
-    }
-  }, [reminders, hasNotificationPermission, language]);
+    setRemindersState(prev => {
+      const updated = prev.map((r) =>
+        r.id === id ? { ...r, enabled: !r.enabled } : r
+      );
+      AsyncStorage.setItem("reminders", JSON.stringify(updated));
+      
+      const reminder = updated.find((r) => r.id === id);
+      if (reminder?.enabled && hasNotificationPermission) {
+        scheduleAlarm(reminder);
+      } else {
+        Notifications.cancelScheduledNotificationAsync(id);
+      }
+      return updated;
+    });
+  }, [hasNotificationPermission, language]);
 
   const updateReminderTime = useCallback(async (id: string, time: string) => {
-    const updated = reminders.map((r) =>
-      r.id === id ? { ...r, time, enabled: true } : r
-    );
-    await setReminders(updated);
-    const reminder = updated.find((r) => r.id === id);
-    if (reminder && hasNotificationPermission) {
-      await scheduleAlarm(reminder);
-    }
-  }, [reminders, hasNotificationPermission, language]);
+    setRemindersState(prev => {
+      const updated = prev.map((r) =>
+        r.id === id ? { ...r, time, enabled: true } : r
+      );
+      AsyncStorage.setItem("reminders", JSON.stringify(updated));
+      
+      const reminder = updated.find((r) => r.id === id);
+      if (reminder && hasNotificationPermission) {
+        scheduleAlarm(reminder);
+      }
+      return updated;
+    });
+  }, [hasNotificationPermission, language]);
 
   const toggleRoutineComplete = useCallback(async (routineId: string) => {
     const todayKey = getTodayKey();
