@@ -52,8 +52,8 @@ export class DatabaseStorage implements IStorage {
   async getCheckInData(): Promise<{daily: number, weekly: number, monthly: number, breakdown: Record<string, number>}> {
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const startOfWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    const startOfMonth = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
     const [dailyRes] = await db.select({ count: sql<number>`count(*)` })
       .from(checkins)
