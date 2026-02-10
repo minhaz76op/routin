@@ -545,24 +545,7 @@ export default function HomeScreen() {
   const { theme } = useTheme();
   const { language } = useApp();
 
-  const resourceCards = [
-    {
-      id: "duas",
-      title: language === "bn" ? "দোয়া" : "Duas",
-      subtitle: language === "bn" ? "প্রতিদিনের দোয়া এবং প্রার্থনা দেখুন" : "View daily duas and prayers",
-      icon: "book" as const,
-      color: "#7C7CD9",
-      screen: "Duas",
-    },
-    {
-      id: "prescription",
-      title: language === "bn" ? "প্রেসক্রিপশন" : "Prescription",
-      subtitle: language === "bn" ? "আপনার প্রেসক্রিপশন দেখুন" : "View your prescription",
-      icon: "file-text" as const,
-      color: "#E8A5A5",
-      screen: "Prescription",
-    },
-  ];
+  const resourceCards = [];
 
   return (
     <FlatList
