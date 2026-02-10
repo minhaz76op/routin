@@ -37,6 +37,7 @@ interface AppContextType {
   reminders: Reminder[];
   setReminders: (reminders: Reminder[]) => void;
   toggleReminder: (id: string) => void;
+  updateReminderTime: (id: string, time: string) => Promise<void>;
   hasNotificationPermission: boolean;
   requestNotificationPermission: () => Promise<boolean>;
   completedRoutines: CompletedRoutines;
@@ -111,6 +112,7 @@ const translations: Record<Language, Record<string, string>> = {
     warmMilk: "1 glass warm milk",
     dateAlmonds: "1 date + 2 almonds",
     reminders: "Reminders",
+    tapToSetAlarm: "Tap any reminder to set alarm",
     reminderSubtitle: "Set daily reminders for your routine",
     enableNotifications: "Enable Notifications",
     notificationPermissionNeeded: "Permission needed to send reminders",
@@ -221,6 +223,7 @@ const translations: Record<Language, Record<string, string>> = {
     warmMilk: "১ গ্লাস গরম দুধ",
     dateAlmonds: "১টি খেজুর + ২টি বাদাম",
     reminders: "রিমাইন্ডার",
+    tapToSetAlarm: "এলার্ম সেট করতে রিমাইন্ডারে ট্যাপ করুন",
     reminderSubtitle: "আপনার রুটিনের জন্য দৈনিক রিমাইন্ডার সেট করুন",
     enableNotifications: "নোটিফিকেশন চালু করুন",
     notificationPermissionNeeded: "রিমাইন্ডার পাঠাতে অনুমতি প্রয়োজন",
@@ -335,7 +338,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const getTodayKey = () => {
-    // Bangladesh is UTC+6
     const now = new Date();
     const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
     const bdTime = new Date(utc + (3600000 * 6));
@@ -366,15 +368,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (Platform.OS === "web") {
       return false;
     }
-    
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
-    
     if (existingStatus !== "granted") {
       const { status } = await Notifications.requestPermissionsAsync();
       finalStatus = status;
     }
-    
     const granted = finalStatus === "granted";
     setHasNotificationPermission(granted);
     return granted;
@@ -395,22 +394,61 @@ export function AppProvider({ children }: { children: ReactNode }) {
     await AsyncStorage.setItem("reminders", JSON.stringify(newReminders));
   };
 
+  const scheduleAlarm = async (reminder: Reminder) => {
+    const [hours, minutes] = reminder.time.split(":").map(Number);
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: translations[language][reminder.title] || reminder.title,
+        body: translations[language].stayHealthy,
+        sound: true,
+        priority: Notifications.AndroidNotificationPriority.MAX,
+        categoryIdentifier: "alarm",
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DAILY,
+        hour: hours,
+        minute: minutes,
+      },
+      identifier: reminder.id,
+    });
+  };
+
+  const toggleReminder = useCallback(async (id: string) => {
+    const updated = reminders.map((r) =>
+      r.id === id ? { ...r, enabled: !r.enabled } : r
+    );
+    await setReminders(updated);
+    const reminder = updated.find((r) => r.id === id);
+    if (reminder?.enabled && hasNotificationPermission) {
+      await scheduleAlarm(reminder);
+    } else {
+      await Notifications.cancelScheduledNotificationAsync(id);
+    }
+  }, [reminders, hasNotificationPermission, language]);
+
+  const updateReminderTime = useCallback(async (id: string, time: string) => {
+    const updated = reminders.map((r) =>
+      r.id === id ? { ...r, time, enabled: true } : r
+    );
+    await setReminders(updated);
+    const reminder = updated.find((r) => r.id === id);
+    if (reminder && hasNotificationPermission) {
+      await scheduleAlarm(reminder);
+    }
+  }, [reminders, hasNotificationPermission, language]);
+
   const toggleRoutineComplete = useCallback(async (routineId: string) => {
     const todayKey = getTodayKey();
     const todayCompleted = completedRoutines[todayKey] || [];
-    
     let updated: string[];
     if (todayCompleted.includes(routineId)) {
       updated = todayCompleted.filter(id => id !== routineId);
     } else {
       updated = [...todayCompleted, routineId];
     }
-    
     const newState = { ...completedRoutines, [todayKey]: updated };
     setCompletedRoutines(newState);
     await AsyncStorage.setItem("completedRoutines", JSON.stringify(newState));
-
-    // Record check-in to server
     try {
       await fetch(`${process.env.EXPO_PUBLIC_DOMAIN}/api/checkins`, {
         method: "POST",
@@ -433,53 +471,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return (completedRoutines[todayKey] || []).length;
   }, [completedRoutines]);
 
-  const toggleReminder = useCallback(async (id: string) => {
-    const updated = reminders.map((r) =>
-      r.id === id ? { ...r, enabled: !r.enabled } : r
-    );
-    setRemindersState(updated);
-    await AsyncStorage.setItem("reminders", JSON.stringify(updated));
-    
-    const reminder = updated.find((r) => r.id === id);
-      if (reminder?.enabled && hasNotificationPermission) {
-        const [hours, minutes] = reminder.time.split(":").map(Number);
-        
-        // Use Bangladesh Time (UTC+6) for calculation
-        const now = new Date();
-        const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-        const bdNow = new Date(utc + (3600000 * 6));
-        
-        const trigger = new Date(bdNow);
-        trigger.setHours(hours, minutes, 0, 0);
-        
-        if (trigger <= bdNow) {
-          trigger.setDate(trigger.getDate() + 1);
-        }
-        
-        // Convert back to system time for notification scheduler
-        const triggerUtc = trigger.getTime() - (3600000 * 6);
-        const systemTrigger = new Date(triggerUtc - (now.getTimezoneOffset() * 60000));
-
-        await Notifications.scheduleNotificationAsync({
-        content: {
-          title: translations[language][reminder.title] || reminder.title,
-          body: translations[language].stayHealthy,
-          sound: true,
-          priority: Notifications.AndroidNotificationPriority.MAX,
-          categoryIdentifier: "alarm",
-        },
-        trigger: {
-          type: Notifications.SchedulableTriggerInputTypes.DAILY,
-          hour: hours,
-          minute: minutes,
-        },
-        identifier: id,
-      });
-    } else {
-      await Notifications.cancelScheduledNotificationAsync(id);
-    }
-  }, [reminders, hasNotificationPermission, language]);
-
   const t = (key: string): string => {
     return translations[language][key] || key;
   };
@@ -495,6 +486,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         reminders,
         setReminders,
         toggleReminder,
+        updateReminderTime,
         hasNotificationPermission,
         requestNotificationPermission,
         completedRoutines,

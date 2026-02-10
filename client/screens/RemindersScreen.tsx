@@ -1,5 +1,6 @@
 import React from "react";
-import { View, StyleSheet, Pressable, Switch, Platform, Linking, ScrollView } from "react-native";
+import { View, StyleSheet, Pressable, Switch, Platform, Linking, ScrollView, Modal } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { Feather } from "@expo/vector-icons";
@@ -152,7 +153,10 @@ interface ReminderCategoryProps {
 
 function ReminderCategory({ category, index }: ReminderCategoryProps) {
   const { theme, isDark } = useTheme();
-  const { language, reminders, toggleReminder, hasNotificationPermission, requestNotificationPermission } = useApp();
+  const { language, reminders, toggleReminder, updateReminderTime, hasNotificationPermission, requestNotificationPermission } = useApp();
+
+  const [timePickerVisible, setTimePickerVisible] = React.useState(false);
+  const [selectedReminder, setSelectedReminder] = React.useState<string | null>(null);
 
   const handleToggle = async (id: string) => {
     if (!hasNotificationPermission) {
@@ -163,6 +167,22 @@ function ReminderCategory({ category, index }: ReminderCategoryProps) {
     }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     toggleReminder(id);
+  };
+
+  const openTimePicker = (id: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setSelectedReminder(id);
+    setTimePickerVisible(true);
+  };
+
+  const handleTimeChange = (event: any, date?: Date) => {
+    setTimePickerVisible(Platform.OS === "ios");
+    if (date && selectedReminder) {
+      const hours = date.getHours().toString().padStart(2, "0");
+      const minutes = date.getMinutes().toString().padStart(2, "0");
+      const timeString = `${hours}:${minutes}`;
+      updateReminderTime(selectedReminder, timeString);
+    }
   };
 
   const getReminderTitle = (titleKey: string) => {
@@ -196,7 +216,7 @@ function ReminderCategory({ category, index }: ReminderCategoryProps) {
           {categoryReminders.map((reminder, idx) => (
             <Pressable
               key={reminder.id}
-              onPress={() => handleToggle(reminder.id)}
+              onPress={() => openTimePicker(reminder.id)}
               style={[
                 styles.reminderRow,
                 {
@@ -230,6 +250,24 @@ function ReminderCategory({ category, index }: ReminderCategoryProps) {
             </Pressable>
           ))}
         </View>
+
+        {timePickerVisible && (
+          <DateTimePicker
+            value={(() => {
+              const r = reminders.find(rem => rem.id === selectedReminder);
+              const d = new Date();
+              if (r) {
+                const [h, m] = r.time.split(":").map(Number);
+                d.setHours(h, m, 0, 0);
+              }
+              return d;
+            })()}
+            mode="time"
+            is24Hour={false}
+            display={Platform.OS === "ios" ? "spinner" : "default"}
+            onChange={handleTimeChange}
+          />
+        )}
       </View>
     </Animated.View>
   );
@@ -239,7 +277,7 @@ export default function RemindersScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const { theme, isDark } = useTheme();
-  const { language, hasNotificationPermission, requestNotificationPermission } = useApp();
+  const { language, t, hasNotificationPermission, requestNotificationPermission } = useApp();
 
   const handleEnableNotifications = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -283,6 +321,13 @@ export default function RemindersScreen() {
           <ThemedText type="body" style={{ color: theme.textSecondary, textAlign: "center", marginTop: Spacing.xs, fontFamily: "Nunito_400Regular" }}>
             {headerSubtitle}
           </ThemedText>
+          
+          <View style={styles.hintBadge}>
+            <Feather name="info" size={14} color={Colors.light.primary} />
+            <ThemedText type="small" style={{ color: Colors.light.primary, marginLeft: Spacing.xs, fontFamily: "Nunito_600SemiBold" }}>
+              {t("tapToSetAlarm")}
+            </ThemedText>
+          </View>
         </LinearGradient>
       </Animated.View>
 
@@ -322,6 +367,15 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.lg,
     padding: Spacing.xl,
     alignItems: "center",
+  },
+  hintBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: Colors.light.primary + "15",
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs,
+    borderRadius: BorderRadius.full,
+    marginTop: Spacing.md,
   },
   permissionCard: {
     borderRadius: BorderRadius.lg,
