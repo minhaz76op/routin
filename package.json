@@ -45,7 +45,7 @@
     "expo-web-browser": "~15.0.9",
     "express": "^5.0.1",
     "http-proxy-middleware": "^3.0.5",
-    "openai": "^6.17.0",
+    "openai": "^6.19.0",
     "p-limit": "^7.3.0",
     "p-retry": "^7.1.1",
     "pg": "^8.16.3",
