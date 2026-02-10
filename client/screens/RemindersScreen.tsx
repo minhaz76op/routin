@@ -214,9 +214,8 @@ function ReminderCategory({ category, index }: ReminderCategoryProps) {
         
         <View style={styles.remindersList}>
           {categoryReminders.map((reminder, idx) => (
-            <Pressable
+            <View
               key={reminder.id}
-              onPress={() => openTimePicker(reminder.id)}
               style={[
                 styles.reminderRow,
                 {
@@ -225,29 +224,34 @@ function ReminderCategory({ category, index }: ReminderCategoryProps) {
                 },
               ]}
             >
-              <View style={[styles.reminderIcon, { backgroundColor: reminderColors[reminder.id] + "20" }]}>
-                <Feather name={reminderIcons[reminder.id]} size={18} color={reminderColors[reminder.id]} />
-              </View>
-              <View style={styles.reminderInfo}>
-                <ThemedText type="body" style={{ fontFamily: "Nunito_500Medium" }}>
-                  {getReminderTitle(reminder.title)}
-                </ThemedText>
-                <ThemedText type="small" style={{ color: theme.textSecondary, fontFamily: "Nunito_400Regular" }}>
-                  {(() => {
-                    const [hours, minutes] = reminder.time.split(":").map(Number);
-                    const ampm = hours >= 12 ? "PM" : "AM";
-                    const h12 = hours % 12 || 12;
-                    return `${h12}:${minutes.toString().padStart(2, "0")} ${ampm}`;
-                  })()}
-                </ThemedText>
-              </View>
+              <Pressable 
+                onPress={() => openTimePicker(reminder.id)}
+                style={styles.reminderInfoPressable}
+              >
+                <View style={[styles.reminderIcon, { backgroundColor: reminderColors[reminder.id] + "20" }]}>
+                  <Feather name={reminderIcons[reminder.id]} size={18} color={reminderColors[reminder.id]} />
+                </View>
+                <View style={styles.reminderInfo}>
+                  <ThemedText type="body" style={{ fontFamily: "Nunito_500Medium" }}>
+                    {getReminderTitle(reminder.title)}
+                  </ThemedText>
+                  <ThemedText type="small" style={{ color: theme.textSecondary, fontFamily: "Nunito_400Regular" }}>
+                    {(() => {
+                      const [hours, minutes] = reminder.time.split(":").map(Number);
+                      const ampm = hours >= 12 ? "PM" : "AM";
+                      const h12 = hours % 12 || 12;
+                      return `${h12}:${minutes.toString().padStart(2, "0")} ${ampm}`;
+                    })()}
+                  </ThemedText>
+                </View>
+              </Pressable>
               <Switch
                 value={reminder.enabled}
                 onValueChange={() => handleToggle(reminder.id)}
                 trackColor={{ false: theme.border, true: reminderColors[reminder.id] + "80" }}
                 thumbColor={reminder.enabled ? reminderColors[reminder.id] : "#fff"}
               />
-            </Pressable>
+            </View>
           ))}
         </View>
 
@@ -426,5 +430,10 @@ const styles = StyleSheet.create({
   reminderInfo: {
     flex: 1,
     marginLeft: Spacing.md,
+  },
+  reminderInfoPressable: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
   },
 });
