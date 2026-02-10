@@ -366,7 +366,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const requestNotificationPermission = async (): Promise<boolean> => {
     if (Platform.OS === "web") {
-      return false;
+      setHasNotificationPermission(true);
+      return true;
     }
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;

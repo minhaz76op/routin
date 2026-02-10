@@ -153,7 +153,7 @@ interface ReminderCategoryProps {
 
 function ReminderCategory({ category, index }: ReminderCategoryProps) {
   const { theme, isDark } = useTheme();
-  const { language, reminders, toggleReminder, updateReminderTime, hasNotificationPermission, requestNotificationPermission } = useApp();
+  const { language, reminders, toggleReminder, updateReminderTime, hasNotificationPermission, requestNotificationPermission, t } = useApp();
 
   const [timePickerVisible, setTimePickerVisible] = React.useState(false);
   const [selectedReminder, setSelectedReminder] = React.useState<string | null>(null);
@@ -241,13 +241,13 @@ function ReminderCategory({ category, index }: ReminderCategoryProps) {
                   <ThemedText type="body" style={{ fontFamily: "Nunito_500Medium" }}>
                     {getReminderTitle(reminder.title)}
                   </ThemedText>
-                  <ThemedText type="small" style={{ color: theme.textSecondary, fontFamily: "Nunito_400Regular" }}>
-                    {(() => {
+                  <ThemedText type="small" style={{ color: reminder.enabled ? theme.textSecondary : Colors.light.primary, fontFamily: "Nunito_400Regular" }}>
+                    {reminder.enabled ? (() => {
                       const [hours, minutes] = reminder.time.split(":").map(Number);
                       const ampm = hours >= 12 ? "PM" : "AM";
                       const h12 = hours % 12 || 12;
                       return `${h12}:${minutes.toString().padStart(2, "0")} ${ampm}`;
-                    })()}
+                    })() : t("tapToEnable")}
                   </ThemedText>
                 </View>
               </Pressable>
@@ -341,7 +341,7 @@ export default function RemindersScreen() {
         </LinearGradient>
       </Animated.View>
 
-      {!hasNotificationPermission && Platform.OS !== "web" ? (
+      {!hasNotificationPermission ? (
         <Animated.View entering={FadeInDown.delay(100).springify()}>
           <Pressable
             onPress={handleEnableNotifications}
